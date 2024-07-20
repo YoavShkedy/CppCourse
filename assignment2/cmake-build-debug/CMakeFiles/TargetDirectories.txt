@@ -1,6 +1,0 @@
-/Users/dell/Yoav/CppCourse/assignment2/cmake-build-debug/CMakeFiles/myrobot.dir
-/Users/dell/Yoav/CppCourse/assignment2/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/dell/Yoav/CppCourse/assignment2/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/Users/dell/Yoav/CppCourse/assignment2/cmake-build-debug/_deps/spdlog-build/CMakeFiles/spdlog.dir
-/Users/dell/Yoav/CppCourse/assignment2/cmake-build-debug/_deps/spdlog-build/CMakeFiles/edit_cache.dir
-/Users/dell/Yoav/CppCourse/assignment2/cmake-build-debug/_deps/spdlog-build/CMakeFiles/rebuild_cache.dir
