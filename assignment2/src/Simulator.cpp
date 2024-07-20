@@ -194,9 +194,10 @@ void Simulator::run() {
 
         std::cout << "SIMULATOR: nextStep: " + getMatchingString(simNextStep) << std::endl;
 
-        // if the algorithm returns 'Finish' -> break the loop
+        // if the algorithm returns 'Finish' -> end run()
         if (simNextStep == Step::Finish) {
-            break;
+            updateSimTotalStepsLog(simNextStep);
+            return;
         } // if the battery is empty and not on docking station
         if (batteryLevel == 0 && simCurrPosition != simDockingStationPosition) {
             throw std::runtime_error("Run out of battery away from docking station");
