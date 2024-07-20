@@ -29,15 +29,22 @@ void Algorithm::setBatteryMeter(const BatteryMeter &batteryMeter) {
 
 Step Algorithm::nextStep() {
     Step res;
+
     if (firstStep) {
         firstStep = false;
         maxBatterySteps = batteryMeter->getBatteryState();
         relax();
     }
+
     if (totalSteps >= int(maxSteps)) {
         res = Step::Finish;
         return res;
     }
+
+    if(int(batteryMeter->getBatteryState()) == 0 && currPosition != dockingStation){
+
+    }
+
     if (returnToDockingStation) {
         if (currPosition == dockingStation) {
             if (batteryMeter->getBatteryState() < maxBatterySteps) {
@@ -51,9 +58,6 @@ Step Algorithm::nextStep() {
                 std::vector<Step> path;
                 auto closestDirtyPoint = findClosestDirtyPoint(path);
                 if (closestDirtyPoint != dockingStation) {
-                    std::cout << "dockingStation = (" + std::to_string(dockingStation.first) + ", " + std::to_string(dockingStation.second) << std::endl;
-                    std::cout << "closestDirtyPoint = (" + std::to_string(closestDirtyPoint.first) + ", " + std::to_string(closestDirtyPoint.second) << std::endl;
-                    throw std::runtime_error("STOP");
                     pathToDirtyPoint = path;
                     followPathToDirtyPoint = true;
                 }
