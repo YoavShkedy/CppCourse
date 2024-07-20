@@ -1,0 +1,217 @@
+Move: West
+Clean
+Clean
+Clean
+Move: West
+Move: West
+Move: West
+Move: East
+Move: West
+Move: East
+Move: West
+Move: West
+Move: East
+Move: East
+Move: West
+Move: East
+Move: West
+Move: East
+Move: East
+Move: East
+Move: East
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Move: West
+Move: East
+Move: West
+Move: East
+Move: West
+Move: West
+Move: West
+Move: East
+Move: West
+Move: East
+Move: West
+Move: East
+Move: West
+Move: East
+Move: East
+Move: East
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Move: West
+Move: West
+Move: West
+Move: North
+Move: South
+Move: East
+Move: West
+Move: North
+Move: North
+Move: South
+Move: North
+Move: South
+Move: South
+Move: East
+Move: West
+Move: North
+Move: South
+Move: East
+Move: East
+Move: East
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Move: West
+Move: West
+Move: East
+Move: East
+Move: West
+Move: East
+Move: West
+Move: West
+Move: West
+Move: North
+Move: South
+Move: East
+Move: East
+Move: East
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Move: West
+Move: West
+Move: East
+Move: West
+Move: East
+Move: West
+Move: West
+Move: West
+Move: West
+Move: North
+Move: South
+Move: East
+Move: East
+Move: East
+Move: East
+Move: West
+Move: East
+Move: West
+Move: East
+Move: East
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Move: West
+Move: West
+Move: West
+Move: East
+Move: East
+Move: East
+Move: West
+Move: East
+Move: West
+Move: East
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Move: West
+Move: East
+Move: West
+Move: West
+Move: East
+Move: West
+Move: West
+Move: North
+Move: North
+Move: North
+
+Total steps: 212
+Total dirt left: 102
+Battery exhausted: No
+Mission success: No

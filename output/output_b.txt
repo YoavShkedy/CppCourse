@@ -1,0 +1,150 @@
+Move: East
+Move: South
+Move: East
+Move: East
+Move: West
+Move: West
+Move: East
+Move: West
+Move: North
+Move: East
+Move: West
+Move: South
+Move: East
+Move: South
+Clean
+Move: North
+Move: West
+Move: North
+Move: East
+Move: West
+Move: South
+Move: East
+Move: West
+Move: East
+Move: East
+Move: West
+Move: West
+Move: North
+Move: West
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Move: South
+Move: South
+Move: North
+Move: West
+Move: West
+Move: East
+Move: West
+Move: East
+Move: North
+Move: East
+Move: West
+Move: East
+Move: East
+Move: East
+Move: East
+Move: West
+Move: West
+Move: West
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Move: South
+Move: North
+Move: West
+Move: East
+Move: West
+Move: South
+Move: West
+Move: West
+Move: East
+Move: East
+Move: East
+Move: East
+Move: North
+Move: West
+Move: East
+Move: West
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Charge
+Move: East
+Move: East
+Move: South
+Move: West
+Move: North
+Move: South
+Move: North
+Move: East
+Move: West
+Move: East
+Move: East
+Move: East
+Clean
+Clean
+Clean
+Move: West
+Move: West
+Move: West
+Move: East
+
+Total steps: 145
+Total dirt left: 18
+Battery exhausted: No
+Mission success: No

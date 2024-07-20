@@ -1,0 +1,9 @@
+Description:
+
+The provided solution includes an additional feature for visual simulation of the vacuum cleaner's operation within the house.
+This visual simulation is executed through the run_with_sim function inside the VacuumCleaner class.
+This feature allows users to visually observe the movement of the vacuum cleaner, dirt cleaning process, and battery charging in real-time.
+
+How to Check:
+
+To execute the visual simulation, run the program with the 'run_with_sim' function instead of 'run' in line 37 of main.cpp.
