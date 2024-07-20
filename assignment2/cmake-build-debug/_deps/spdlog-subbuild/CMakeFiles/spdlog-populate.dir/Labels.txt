@@ -1,0 +1,14 @@
+# Target labels
+ spdlog-populate
+# Source files and their labels
+/Users/dell/Yoav/CppCourse/assignment2/cmake-build-debug/_deps/spdlog-subbuild/CMakeFiles/spdlog-populate
+/Users/dell/Yoav/CppCourse/assignment2/cmake-build-debug/_deps/spdlog-subbuild/CMakeFiles/spdlog-populate.rule
+/Users/dell/Yoav/CppCourse/assignment2/cmake-build-debug/_deps/spdlog-subbuild/CMakeFiles/spdlog-populate-complete.rule
+/Users/dell/Yoav/CppCourse/assignment2/cmake-build-debug/_deps/spdlog-subbuild/spdlog-populate-prefix/src/spdlog-populate-stamp/spdlog-populate-build.rule
+/Users/dell/Yoav/CppCourse/assignment2/cmake-build-debug/_deps/spdlog-subbuild/spdlog-populate-prefix/src/spdlog-populate-stamp/spdlog-populate-configure.rule
+/Users/dell/Yoav/CppCourse/assignment2/cmake-build-debug/_deps/spdlog-subbuild/spdlog-populate-prefix/src/spdlog-populate-stamp/spdlog-populate-download.rule
+/Users/dell/Yoav/CppCourse/assignment2/cmake-build-debug/_deps/spdlog-subbuild/spdlog-populate-prefix/src/spdlog-populate-stamp/spdlog-populate-install.rule
+/Users/dell/Yoav/CppCourse/assignment2/cmake-build-debug/_deps/spdlog-subbuild/spdlog-populate-prefix/src/spdlog-populate-stamp/spdlog-populate-mkdir.rule
+/Users/dell/Yoav/CppCourse/assignment2/cmake-build-debug/_deps/spdlog-subbuild/spdlog-populate-prefix/src/spdlog-populate-stamp/spdlog-populate-patch.rule
+/Users/dell/Yoav/CppCourse/assignment2/cmake-build-debug/_deps/spdlog-subbuild/spdlog-populate-prefix/src/spdlog-populate-stamp/spdlog-populate-test.rule
+/Users/dell/Yoav/CppCourse/assignment2/cmake-build-debug/_deps/spdlog-subbuild/spdlog-populate-prefix/src/spdlog-populate-stamp/spdlog-populate-update.rule

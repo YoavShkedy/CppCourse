@@ -1,0 +1,21 @@
+# ninja log v5
+0	31	1721470034187325100	spdlog-populate-prefix/src/spdlog-populate-stamp/spdlog-populate-mkdir	2acdf0227c03341e
+0	31	1721470034187325100	/Users/dell/Yoav/CppCourse/assignment2/cmake-build-debug/_deps/spdlog-subbuild/spdlog-populate-prefix/src/spdlog-populate-stamp/spdlog-populate-mkdir	2acdf0227c03341e
+31	13986	1721470048142021347	spdlog-populate-prefix/src/spdlog-populate-stamp/spdlog-populate-download	36d224b7d395d0be
+31	13986	1721470048142021347	/Users/dell/Yoav/CppCourse/assignment2/cmake-build-debug/_deps/spdlog-subbuild/spdlog-populate-prefix/src/spdlog-populate-stamp/spdlog-populate-download	36d224b7d395d0be
+13986	14082	0	spdlog-populate-prefix/src/spdlog-populate-stamp/spdlog-populate-update	49a13cf9277f4ebc
+13986	14082	0	/Users/dell/Yoav/CppCourse/assignment2/cmake-build-debug/_deps/spdlog-subbuild/spdlog-populate-prefix/src/spdlog-populate-stamp/spdlog-populate-update	49a13cf9277f4ebc
+14082	14117	1721470048273400329	spdlog-populate-prefix/src/spdlog-populate-stamp/spdlog-populate-patch	684a9c5c436db4c6
+14082	14117	1721470048273400329	/Users/dell/Yoav/CppCourse/assignment2/cmake-build-debug/_deps/spdlog-subbuild/spdlog-populate-prefix/src/spdlog-populate-stamp/spdlog-populate-patch	684a9c5c436db4c6
+14117	14147	1721470048303296754	spdlog-populate-prefix/src/spdlog-populate-stamp/spdlog-populate-configure	6f9eaa5823a81398
+14117	14147	1721470048303296754	/Users/dell/Yoav/CppCourse/assignment2/cmake-build-debug/_deps/spdlog-subbuild/spdlog-populate-prefix/src/spdlog-populate-stamp/spdlog-populate-configure	6f9eaa5823a81398
+14147	14176	1721470048332384960	spdlog-populate-prefix/src/spdlog-populate-stamp/spdlog-populate-build	3f1b7f1fcea241e4
+14147	14176	1721470048332384960	/Users/dell/Yoav/CppCourse/assignment2/cmake-build-debug/_deps/spdlog-subbuild/spdlog-populate-prefix/src/spdlog-populate-stamp/spdlog-populate-build	3f1b7f1fcea241e4
+14176	14206	1721470048362347639	spdlog-populate-prefix/src/spdlog-populate-stamp/spdlog-populate-install	38fe554746e55bef
+14176	14206	1721470048362347639	/Users/dell/Yoav/CppCourse/assignment2/cmake-build-debug/_deps/spdlog-subbuild/spdlog-populate-prefix/src/spdlog-populate-stamp/spdlog-populate-install	38fe554746e55bef
+14206	14234	1721470048390987631	spdlog-populate-prefix/src/spdlog-populate-stamp/spdlog-populate-test	c8bcd54a51123bfb
+14206	14234	1721470048390987631	/Users/dell/Yoav/CppCourse/assignment2/cmake-build-debug/_deps/spdlog-subbuild/spdlog-populate-prefix/src/spdlog-populate-stamp/spdlog-populate-test	c8bcd54a51123bfb
+14234	14275	1721470048432112722	CMakeFiles/spdlog-populate-complete	14872e8ab718817d
+14234	14275	1721470048432112722	spdlog-populate-prefix/src/spdlog-populate-stamp/spdlog-populate-done	14872e8ab718817d
+14234	14275	1721470048432112722	/Users/dell/Yoav/CppCourse/assignment2/cmake-build-debug/_deps/spdlog-subbuild/CMakeFiles/spdlog-populate-complete	14872e8ab718817d
+14234	14275	1721470048432112722	/Users/dell/Yoav/CppCourse/assignment2/cmake-build-debug/_deps/spdlog-subbuild/spdlog-populate-prefix/src/spdlog-populate-stamp/spdlog-populate-done	14872e8ab718817d

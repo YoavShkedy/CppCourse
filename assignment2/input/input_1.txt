@@ -1,0 +1,9 @@
+1-Small house
+MaxSteps = 1000
+MaxBattery=100
+Rows = 4
+Cols =10
+WWWW
+W D
+W 123456789
+
