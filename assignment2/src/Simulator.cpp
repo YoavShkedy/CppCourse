@@ -106,7 +106,7 @@ void Simulator::readHouseFile(const std::string &filePath) {
         if (int(currRow.size()) < cols) {
             currRow.resize(cols, ' ');
         }
-            // if the number of cols in the given layout is greater than 'Cols' -> shorten the row by deleting the last elements
+        // if the number of cols in the given layout is greater than 'Cols' -> shorten the row by deleting the last elements
         else if (int(currRow.size()) > cols) {
             currRow.resize(cols);
         }
@@ -167,8 +167,8 @@ void Simulator::printHouseLayout() const {
     std::cout << wall << std::endl;
 }
 
-void Simulator::setAlgorithm(Algorithm algo) {
-    this->algo = algo;
+void Simulator::setAlgorithm(Algorithm algorithm) {
+    this->algo = algorithm;
     this->algo.setMaxSteps(maxSteps);
     this->algo.setWallsSensor(*this);
     this->algo.setDirtSensor(*this);

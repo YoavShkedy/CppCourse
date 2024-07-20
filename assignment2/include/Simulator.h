@@ -18,7 +18,7 @@
 class Simulator : public WallsSensor, public DirtSensor, public BatteryMeter {
 public:
     Simulator();
-    void setAlgorithm(Algorithm algo);
+    void setAlgorithm(Algorithm algorithm);
     // WallSensor implementation
     bool isWall(Direction d) const override;
     // DirtSensor implementation

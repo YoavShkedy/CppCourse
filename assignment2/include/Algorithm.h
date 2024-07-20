@@ -8,6 +8,16 @@
 #include <memory>
 
 class Algorithm : public AbstractAlgorithm {
+public:
+    Algorithm();
+
+    void setMaxSteps(size_t maxSteps) override;
+    void setWallsSensor(const WallsSensor& wallsSensor) override;
+    void setDirtSensor(const DirtSensor& dirtSensor) override;
+    void setBatteryMeter(const BatteryMeter& batteryMeter) override;
+    Step nextStep() override;
+
+private:
     size_t maxSteps;
     const WallsSensor* wallsSensor;
     const DirtSensor* dirtSensor;
@@ -21,21 +31,10 @@ class Algorithm : public AbstractAlgorithm {
     std::unordered_map<std::pair<int, int>, std::shared_ptr<Vertex>, VertexHash> vertices;
     std::pair<int, int> dockingStation;
     std::pair<int, int> currPosition;
-    std::pair<int, int> prevPosition;
     bool returnToDockingStation = false;
     bool returnToLastCleaningPosition = false;
 
-
-public:
-    Algorithm();
-
-    void setMaxSteps(size_t maxSteps) override;
-    void setWallsSensor(const WallsSensor& wallsSensor) override;
-    void setDirtSensor(const DirtSensor& dirtSensor) override;
-    void setBatteryMeter(const BatteryMeter& batteryMeter) override;
-    Step nextStep() override;
-
-private:
+    // private functions:
     Step moveTo(std::pair<int, int> targetPosition);
     void updateCurrPosition(Step step);
     void relax();
