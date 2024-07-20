@@ -17,15 +17,6 @@ find_package(Boost REQUIRED)
 # Include Boost directories
 include_directories(${Boost_INCLUDE_DIRS})
 
-# Integrate spdlog using FetchContent
-include(FetchContent)
-FetchContent_Declare(
-        spdlog
-        GIT_REPOSITORY https://github.com/gabime/spdlog.git
-        GIT_TAG v1.10.0 # Use the latest stable version or specify the version you need
-)
-FetchContent_MakeAvailable(spdlog)
-
 # Add the executable and source files
 add_executable(myrobot
         src/main.cpp
@@ -33,6 +24,16 @@ add_executable(myrobot
         src/Algorithm.cpp
         src/Simulator.cpp
         )
+
+# Integrate spdlog using FetchContent
+include(FetchContent)
+FetchContent_Declare(
+        spdlog
+        GIT_REPOSITORY https://github.com/gabime/spdlog.git
+        GIT_TAG v1.10.0 # Use the latest stable version or specify the version you need
+)
+
+FetchContent_MakeAvailable(spdlog)
 
 # Link spdlog to your project
 target_link_libraries(myrobot PRIVATE spdlog::spdlog)
