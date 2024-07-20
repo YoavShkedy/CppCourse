@@ -788,6 +788,7 @@ CMakeFiles/myrobot.dir/src/Algorithm.cpp.o: /Users/dell/Yoav/CppCourse/assignmen
   /Users/dell/Yoav/CppCourse/assignment2/include/utils.h \
   /Users/dell/Yoav/CppCourse/assignment2/include/wall_sensor.h \
   /Users/dell/Yoav/CppCourse/assignment2/include/Algorithm.h \
+  /Users/dell/Yoav/CppCourse/assignment2/include/utils.h \
   /usr/local/include/boost/config.hpp \
   /usr/local/include/boost/config/compiler/clang.hpp \
   /usr/local/include/boost/config/compiler/clang_version.hpp \
@@ -1656,6 +1657,7 @@ CMakeFiles/myrobot.dir/src/Simulator.cpp.o: /Users/dell/Yoav/CppCourse/assignmen
   /Users/dell/Yoav/CppCourse/assignment2/include/utils.h \
   /Users/dell/Yoav/CppCourse/assignment2/include/wall_sensor.h \
   /Users/dell/Yoav/CppCourse/assignment2/include/Simulator.h \
+  /Users/dell/Yoav/CppCourse/assignment2/include/utils.h \
   /usr/local/include/boost/config.hpp \
   /usr/local/include/boost/config/compiler/clang.hpp \
   /usr/local/include/boost/config/compiler/clang_version.hpp \
