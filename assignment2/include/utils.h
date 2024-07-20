@@ -10,9 +10,6 @@
 #include <utility> // For std::pair
 #include <boost/functional/hash.hpp> // For boost::hash
 #include <limits>
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>

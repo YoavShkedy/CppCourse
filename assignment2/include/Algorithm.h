@@ -30,7 +30,9 @@ private:
     std::pair<int, int> dockingStation;
     std::pair<int, int> currPosition;
     bool returnToDockingStation = false;
-    bool returnToLastCleaningPosition = false;
+    [[maybe_unused]] bool returnToLastCleaningPosition = false;
+    bool followPathToDirtyPoint = false;
+    std::vector<Step> pathToDirtyPoint;
 
     // private functions:
     Step moveTo(std::pair<int, int> targetPosition);
@@ -38,6 +40,7 @@ private:
     void relax();
     Step chooseNeighbor();
     Step navigateTo(std::pair<int, int> targetPosition);
+    std::pair<int, int> findClosestDirtyPoint(std::vector<Step>& path);
 };
 
 #endif // ALGORITHM_H

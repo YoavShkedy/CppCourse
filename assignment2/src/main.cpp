@@ -4,27 +4,6 @@
 #include "../include/Simulator.h"
 
 int main(int argc, char **argv) {
-    // Set the global log level to debug
-    spdlog::set_level(spdlog::level::debug);
-
-    // Create console and file sinks
-    auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-    auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/debug.log", true);
-
-    // Combine the sinks
-    std::vector<spdlog::sink_ptr> sinks {console_sink, file_sink};
-    auto logger = std::make_shared<spdlog::logger>("multi_sink", sinks.begin(), sinks.end());
-
-    // Set the logger to flush on debug level
-    logger->flush_on(spdlog::level::debug);
-
-    // Set the combined logger as the default logger
-    spdlog::set_default_logger(logger);
-
-    // Log a startup message
-    spdlog::info("\nLogger initialized and set as default\n");
-    spdlog::default_logger()->flush(); // Ensure log is flushed
-
     try {
         if (argc < 2) {
             throw std::runtime_error("Usage: myrobot <house_input_file>");

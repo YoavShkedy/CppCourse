@@ -25,18 +25,5 @@ add_executable(myrobot
         src/Simulator.cpp
         )
 
-# Integrate spdlog using FetchContent
-include(FetchContent)
-FetchContent_Declare(
-        spdlog
-        GIT_REPOSITORY https://github.com/gabime/spdlog.git
-        GIT_TAG v1.10.0 # Use the latest stable version or specify the version you need
-)
-
-FetchContent_MakeAvailable(spdlog)
-
-# Link spdlog to your project
-target_link_libraries(myrobot PRIVATE spdlog::spdlog)
-
 # Set include directories for the executable
 target_include_directories(myrobot PRIVATE include)
