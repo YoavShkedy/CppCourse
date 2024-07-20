@@ -257,6 +257,7 @@ void Simulator::printHouseLayoutForSim(const std::string& action) const {
     std::cout << "Total Steps Taken: " << simTotalSteps << "\n" << std::endl;
     std::cout << "Action: " << action << std::endl;
     std::cout << "Battery Level: " << batteryLevel << std::endl;
+    std::cout << "Max battery steps: " << maxBatterySteps << std::endl;
     std::cout << "Total Dirt Left: " << totalDirt << "\n" << std::endl;
 
     std::string wall(cols + 2, 'W');
@@ -283,7 +284,7 @@ void Simulator::runWithSim() {
     // Initial print
     printHouseLayoutForSim("Starting");
 
-    while (totalDirt > 0 || simCurrPosition != simDockingStationPosition) {
+    while (true) {
         Step simNextStep = algo.nextStep();
         std::string action = getMatchingString(simNextStep);
 
@@ -299,6 +300,12 @@ void Simulator::runWithSim() {
                 // prevent over charging the battery
                 if (int(batteryLevel) > maxBatterySteps) {
                     updateBatteryLevel(maxBatterySteps - batteryLevel);
+                }
+                if (int(batteryLevel) < maxBatterySteps) {
+                    // Skip showing the charging process
+                    simTotalSteps++;
+                    simTotalStepsLog.push_back(getMatchingString(simNextStep));
+                    continue;
                 }
             } else { // if not on docking station -> clean()
                 updateBatteryLevel(-1);
@@ -318,7 +325,7 @@ void Simulator::runWithSim() {
 
         // Print the house layout after each action
         printHouseLayoutForSim(action);
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(std::chrono::milliseconds (350));
     }
 
     printHouseLayoutForSim("Mission Completed");

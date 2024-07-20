@@ -6,6 +6,7 @@
 #include <queue>
 #include <unordered_map>
 #include <memory>
+#include <vector>
 
 class Algorithm : public AbstractAlgorithm {
     size_t maxSteps;
@@ -23,8 +24,8 @@ class Algorithm : public AbstractAlgorithm {
     std::pair<int, int> currPosition;
     std::pair<int, int> prevPosition;
     bool returnToDockingStation = false;
-    bool returnToLastCleaningPosition = false;
-
+    bool followPathToDirtyPoint = false;
+    std::vector<Step> pathToDirtyPoint;
 
 public:
     Algorithm();
@@ -41,6 +42,7 @@ private:
     void relax();
     Step chooseNeighbor();
     Step navigateTo(std::pair<int, int> targetPosition);
+    std::pair<int, int> findClosestDirtyPoint(std::vector<Step>& path);
 };
 
 #endif // ALGORITHM_H

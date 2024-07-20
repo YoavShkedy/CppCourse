@@ -1,13 +1,14 @@
 #include <iostream>
+#include <queue>
 #include "../include/Algorithm.h"
+#include "../include/utils.h"
 
 Algorithm::Algorithm() : maxSteps(0), wallsSensor(nullptr), dirtSensor(nullptr), batteryMeter(nullptr), maxBatterySteps(0),
                          currTripSteps(0), totalSteps(0),
                          dockingStation(0, 0), currPosition(0, 0) {
     // Create a new Vertex for the docking station
-    auto dockingStationVertex = std::make_shared<Vertex>(std::make_pair(0, 0), 0,
-                                                         Step::Stay); // Step::Stay is used as null
-    vertices[dockingStation] = std::move(dockingStationVertex);
+    auto dockingStationVertex = std::make_shared<Vertex>(dockingStation, 0, Step::Stay);
+    vertices[dockingStation] = dockingStationVertex;
 }
 
 void Algorithm::setMaxSteps(std::size_t maxSteps) {
@@ -27,38 +28,38 @@ void Algorithm::setBatteryMeter(const BatteryMeter &batteryMeter) {
 }
 
 Step Algorithm::nextStep() {
-    std::cout << "\nvertices[currPosition]->d: " << vertices[currPosition]->d << '\n' << std::endl;
     Step res;
-    // the battery is guaranteed to be fully charged on the first step
     if (firstStep) {
         firstStep = false;
         maxBatterySteps = batteryMeter->getBatteryState();
-        relax(); // relax() the docking station
-    } // if no more steps allowed -> return 'Finish'
+        relax();
+    }
     if (totalSteps >= int(maxSteps)) {
         res = Step::Finish;
         return res;
     }
-    /* on the way back to the docking station */
     if (returnToDockingStation) {
-        std::cout << "\nreturnToDockingStation ==  TRUE" << std::endl;
         if (currPosition == dockingStation) {
-            std::cout << "##### arrivedToDockingStation #####\n" << std::endl;
-            // if battery is not full -> continue charging process
             if (batteryMeter->getBatteryState() < maxBatterySteps) {
+                // Charge
                 res = Step::Stay;
                 totalSteps++;
                 return res;
-            } else { // on docking station with full battery
-                std::cout << "\n<<<<< batteryFullyCharged >>>>>" << std::endl;
-                std::cout << "returnToDockingStation ==  FALSE\n" << std::endl;
+            } else {
+                // Robot is charged. Navigate to the closest dirty position
                 returnToDockingStation = false;
-                returnToLastCleaningPosition = true;
-                std::cout << "\n$$$$$$$$$$$$$$$ END_PROCESS: returnToDockingStation $$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
-                std::cout << "\n$$$$$$$$$$$$$$$ START_PROCESS: returnToLastCleaningPosition $$$$$$$$$$$$$$$" << std::endl;
+                std::vector<Step> path;
+                auto closestDirtyPoint = findClosestDirtyPoint(path);
+                if (closestDirtyPoint != dockingStation) {
+                    std::cout << "dockingStation = (" + std::to_string(dockingStation.first) + ", " + std::to_string(dockingStation.second) << std::endl;
+                    std::cout << "closestDirtyPoint = (" + std::to_string(closestDirtyPoint.first) + ", " + std::to_string(closestDirtyPoint.second) << std::endl;
+                    throw std::runtime_error("STOP");
+                    pathToDirtyPoint = path;
+                    followPathToDirtyPoint = true;
+                }
             }
-        } else { // returnToDockingStation == True AND currPosition != dockingStation
-            relax(); // relax() all the vertices on the way back to the docking station
+        } else {
+            relax();
             res = vertices[currPosition]->pai;
             updateCurrPosition(res);
             tripStepsLog.push_back(getOppositeStep(res));
@@ -66,37 +67,24 @@ Step Algorithm::nextStep() {
             return res;
         }
     }
-    /* on the way back from the docking station to the last cleaning position */
-    if (returnToLastCleaningPosition) {
-        std::cout << "returnToLastCleaningPosition == TRUE\n" << std::endl;
-        // if tripStepsLog is empty -> you returned to the last cleaning position, so continue with a new step
-        if (tripStepsLog.empty()) {
-            std::cout << "\n$$$$$$$$$$$$$$$ END_PROCESS: returnToLastCleaningPosition $$$$$$$$$$$$$$$" << std::endl;
-            std::cout << "returnToLastCleaningPosition == FALSE" << std::endl;
-            std::cout << "\nvertices[currPosition]->d: " << vertices[currPosition]->d << '\n' << std::endl;
-            returnToLastCleaningPosition = false;
-        } else { // continue returning to the last cleaning position
-            relax(); // relax() all the vertices on the way back to the last cleaning position
-            res = tripStepsLog.front();
-            updateCurrPosition(res);
-            tripStepsLog.pop_front();
-            totalSteps++;
-            return res;
+    if (followPathToDirtyPoint && !pathToDirtyPoint.empty()) {
+        res = pathToDirtyPoint.front();
+        pathToDirtyPoint.erase(pathToDirtyPoint.begin());
+        if (pathToDirtyPoint.empty()) {
+            followPathToDirtyPoint = false;
         }
+        updateCurrPosition(res);
+        totalSteps++;
+        return res;
     }
-    relax(); // get accurate distance from the docking station
-    /* if battery OR available steps are low -> return to docking station */
+    relax();
     if (int(batteryMeter->getBatteryState()) <= (vertices[currPosition]->d + 1) ||
         (int(maxSteps) - totalSteps) <= (vertices[currPosition]->d + 1)) {
-        // edge case: currPosition == dockingStation AND totalSteps == maxSteps
-        if (totalSteps == int(maxSteps)) { // TODO: check if redundant
+        if (totalSteps == int(maxSteps)) {
             res = Step::Finish;
             return res;
         }
-        // start the process of returning to the docking station
-        std::cout << "\n$$$$$$$$$$$$$$$ START_PROCESS: returnToDockingStation $$$$$$$$$$$$$$$" << std::endl;
         returnToDockingStation = true;
-        // take the first step in the shortest path back to the docking station
         res = vertices[currPosition]->pai;
         updateCurrPosition(res);
         tripStepsLog.clear();
@@ -104,16 +92,14 @@ Step Algorithm::nextStep() {
         totalSteps++;
         return res;
     }
-    /* if the current position is dirty -> clean */
     if (dirtSensor->dirtLevel() > 0) {
-        vertices[currPosition]->vertexDirtLevel--; // update currPosition dirt level
+        vertices[currPosition]->vertexDirtLevel--;
         res = Step::Stay;
         totalSteps++;
         return res;
     }
-    /* choose the next step */
     res = chooseNeighbor();
-    tripStepsLog.push_back(res); // record the step in the log
+    tripStepsLog.push_back(res);
     updateCurrPosition(res);
     totalSteps++;
     return res;
@@ -125,21 +111,28 @@ void Algorithm::updateCurrPosition(Step step) {
 
 void Algorithm::relax() {
     auto currVertex = vertices[currPosition];
-    currVertex->vertexDirtLevel = dirtSensor->dirtLevel(); // update the currPosition dirt level
-    currVertex->visited = true; // mark vertex as visited
+    currVertex->vertexDirtLevel = dirtSensor->dirtLevel();
+    currVertex->visited = true;
     for (Direction dir: {Direction::North, Direction::East, Direction::South, Direction::West}) {
-        auto newPosition = moveInDirection(currVertex->position, dir); // (currVertex->position) equals currPosition
-        if (!wallsSensor->isWall(dir)) { // if newPosition != wall
-            // if a vertex already exists for newPosition -> do relax
+        auto newPosition = moveInDirection(currVertex->position, dir);
+        if (!wallsSensor->isWall(dir)) {
             if (vertices.find(newPosition) != vertices.end()) {
                 if (currVertex->d > vertices[newPosition]->d + 1) {
                     currVertex->d = vertices[newPosition]->d + 1;
                     currVertex->pai = getMatchingStep(dir);
                 }
-            } else { // if currPosition does not have a vertex AND is not a wall -> create a new vertex
-                auto newVertex = std::make_shared<Vertex>(newPosition, currVertex->d + 1,
-                                                          getMatchingStep(getOppositeDirection(dir)));
-                vertices[newPosition] = std::move(newVertex);
+                auto newVertex = vertices[newPosition];
+                if (std::find(currVertex->neighbors.begin(), currVertex->neighbors.end(), newPosition) == currVertex->neighbors.end()) {
+                    currVertex->neighbors.push_back(newPosition);
+                }
+                if (std::find(newVertex->neighbors.begin(), newVertex->neighbors.end(), currVertex->position) == newVertex->neighbors.end()) {
+                    newVertex->neighbors.push_back(currVertex->position);
+                }
+            } else {
+                auto newVertex = std::make_shared<Vertex>(newPosition, currVertex->d + 1, getMatchingStep(getOppositeDirection(dir)));
+                vertices[newPosition] = newVertex;
+                currVertex->neighbors.push_back(newPosition);
+                newVertex->neighbors.push_back(currVertex->position);
             }
         }
     }
@@ -148,10 +141,9 @@ void Algorithm::relax() {
 Step Algorithm::chooseNeighbor() {
     Direction direction;
     int maxDirtLevel = -1;
-    // all neighbors should already exist in vertices[] due to previous relax()
     for (Direction dir: {Direction::North, Direction::East, Direction::South, Direction::West}) {
-        auto newPosition = moveInDirection(currPosition, dir); // currVertex->position == currPosition
-        if (!wallsSensor->isWall(dir)) { // make sure newPosition is NOT a wall
+        auto newPosition = moveInDirection(currPosition, dir);
+        if (!wallsSensor->isWall(dir)) {
             if (vertices[newPosition]->vertexDirtLevel > maxDirtLevel) {
                 maxDirtLevel = vertices[newPosition]->vertexDirtLevel;
                 direction = dir;
@@ -170,8 +162,43 @@ Step Algorithm::moveTo(std::pair<int, int> targetPosition) {
 }
 
 Step Algorithm::navigateTo(std::pair<int, int> targetPosition) {
-    // Implement a pathfinding algorithm like A* to navigate back to the docking station
-    // This is a placeholder for actual pathfinding logic
     return moveTo(targetPosition);
 }
 
+std::pair<int, int> Algorithm::findClosestDirtyPoint(std::vector<Step>& path) {
+    std::queue<std::pair<int, int>> q;
+    std::unordered_map<std::pair<int, int>, bool, VertexHash> visited;
+    std::unordered_map<std::pair<int, int>, std::pair<int, int>, VertexHash> parent;
+
+    q.push(dockingStation);
+    visited[dockingStation] = true;
+
+    std::pair<int, int> closestDirtyPoint = dockingStation;
+
+    while (!q.empty()) {
+        auto current = q.front();
+        q.pop();
+
+        if (dirtSensor->dirtLevel() > 0) {
+            closestDirtyPoint = current;
+            break;
+        }
+
+        for (const auto& neighbor : vertices[current]->neighbors) {
+            if (!visited[neighbor]) {
+                visited[neighbor] = true;
+                parent[neighbor] = current;
+                q.push(neighbor);
+            }
+        }
+    }
+
+    std::pair<int, int> step = closestDirtyPoint;
+    while (step != dockingStation) {
+        auto parentStep = parent[step];
+        path.insert(path.begin(), moveTo(step));
+        step = parentStep;
+    }
+
+    return closestDirtyPoint;
+}

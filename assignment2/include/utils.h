@@ -31,6 +31,7 @@ public:
     int d; // The distance in steps from the docking station
     Step pai; // The step need to take for the shortest path back to the docking station
     int vertexDirtLevel = INT_MAX;
+    std::vector<std::pair<int, int>> neighbors;
 
     Vertex(std::pair<int, int> position, int d, Step pai) : position(position), visited(false), d(d), pai(pai) {}
 

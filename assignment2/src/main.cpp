@@ -37,7 +37,8 @@ int main(int argc, char **argv) {
         simulator.printHouseLayout();
         std::cout << '\n';
 
-        simulator.run();
+//        simulator.run();
+        simulator.runWithSim();
 
         std::string dockingStationPosition =
                 "(" + std::to_string(simulator.getSimDockingStationPosition().first) + ", " +
