@@ -3,9 +3,7 @@
 
 #include "utils.h"
 #include "abstract_algorithm.h"
-#include <queue>
-#include <unordered_map>
-#include <memory>
+
 
 class Algorithm : public AbstractAlgorithm {
 public:

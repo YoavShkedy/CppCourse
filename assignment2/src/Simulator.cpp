@@ -1,11 +1,7 @@
 #include "../include/Simulator.h"
-#include "../include/utils.h"
 
-#include <thread>
-#include <chrono>
-#include <vector>
-
-Simulator::Simulator() {}
+Simulator::Simulator() : rows(-1), cols(-1), maxSteps(-1), maxBatterySteps(-1), totalDirt(0), simTotalSteps(0),
+                         batteryLevel(-1) {}
 
 // WallSensor implementation
 bool Simulator::isWall(Direction d) const {
@@ -27,8 +23,7 @@ bool Simulator::isWall(Direction d) const {
     // if position is out of house layout bounds -> return true (it's a wall)
     if (row < 0 || row > (int(houseLayout.size()) - 1) || col < 0 || col > (int(houseLayout[row].size()) - 1)) {
         return true;
-    }
-        // check if there is a wall in houseLayout[row][col]
+    } // check if there is a wall in houseLayout[row][col]
     else if (houseLayout[row][col] == 'W') return true;
     else return false;
 }
@@ -55,7 +50,7 @@ void Simulator::updateDirtLevel(int num) {
     houseLayout[simCurrPosition.first][simCurrPosition.second] += num;
 }
 
-int Simulator::getTotalDirt() {
+int Simulator::getTotalDirt() const {
     return totalDirt;
 }
 
@@ -70,6 +65,11 @@ void Simulator::updateCurrentPosition(Step step) {
 void Simulator::readHouseFile(const std::string &filePath) {
     std::ifstream file(filePath);
     if (!file.is_open()) throw std::runtime_error("Could not open file");
+
+    /* extract the input file name from the path, to be used in the output file name */
+    std::filesystem::path inputPath(filePath);
+    input_file_name = inputPath.filename().string();
+
     /* initialize houseLayoutName, MaxSteps, MaxBattery, Rows, Cols */
     std::string line;
     if (getline(file, houseLayoutName)) {
@@ -106,7 +106,7 @@ void Simulator::readHouseFile(const std::string &filePath) {
         if (int(currRow.size()) < cols) {
             currRow.resize(cols, ' ');
         }
-        // if the number of cols in the given layout is greater than 'Cols' -> shorten the row by deleting the last elements
+            // if the number of cols in the given layout is greater than 'Cols' -> shorten the row by deleting the last elements
         else if (int(currRow.size()) > cols) {
             currRow.resize(cols);
         }
@@ -181,7 +181,7 @@ std::pair<int, int> Simulator::getSimCurrPosition() {
 
 std::pair<int, int> Simulator::getSimDockingStationPosition() {
     return simDockingStationPosition;
-};
+}
 
 void Simulator::run() {
     std::cout << "SIMULATOR: DockingStationPosition: (" + std::to_string(simCurrPosition.first) + ", " +
@@ -197,6 +197,7 @@ void Simulator::run() {
         // if the algorithm returns 'Finish' -> end run()
         if (simNextStep == Step::Finish) {
             updateSimTotalStepsLog(simNextStep);
+            createOutputFile();
             return;
         } // if the battery is empty and not on docking station
         if (batteryLevel == 0 && simCurrPosition != simDockingStationPosition) {
@@ -240,18 +241,30 @@ void Simulator::run() {
 
 void Simulator::updateSimTotalStepsLog(Step step) {
     std::string s;
-    switch(step) {
-        case Step::Stay: s = 's';
-        case Step::North: s = 'N';
-        case Step::East: s = 'E';
-        case Step::South: s = 'S';
-        case Step::West: s = 'W';
-        case Step::Finish: s = 'F';
+    switch (step) {
+        case Step::Stay:
+            s = 's';
+            break;
+        case Step::North:
+            s = 'N';
+            break;
+        case Step::East:
+            s = 'E';
+            break;
+        case Step::South:
+            s = 'S';
+            break;
+        case Step::West:
+            s = 'W';
+            break;
+        case Step::Finish:
+            s = 'F';
+            break;
     }
     simTotalStepsLog.push_back(s);
 }
 
-void Simulator::printHouseLayoutForSim(const std::string& action) const {
+void Simulator::printHouseLayoutForSim(const std::string &action) const {
     system("clear"); // Clear the screen. Use "CLS" for Windows.
 
     std::cout << "Max steps allowed: " << maxSteps << std::endl;
@@ -323,4 +336,36 @@ void Simulator::runWithSim() {
     }
 
     printHouseLayoutForSim("Mission Completed");
+}
+
+void Simulator::createOutputFile() {
+    // create outputFileName
+    std::string outputFileName = "output_" + input_file_name;
+    std::ofstream outputFile(outputFileName);
+    if(!outputFile) { // make sure the output file has been created
+        std::string err = "Error opening file: " + outputFileName;
+        throw std::runtime_error(err);
+    }
+    outputFile << "NumSteps = " << simTotalSteps << std::endl;
+    outputFile << "DirtLeft = " << totalDirt << std::endl;
+    std::string status = "FINISHED"; // default value
+    std::string lastStep = simTotalStepsLog.back();
+
+    if (lastStep == "F" && totalDirt > 0) {
+        status = "WORKING";
+    } else if (lastStep != "F" && (maxSteps - simTotalSteps == 0)) {
+        status = "DEAD";
+    }
+
+    outputFile << "Status = " << status << std::endl;
+    std::string steps_log = parseSimTotalStepsLog();
+    outputFile << "Steps: " << steps_log << std::endl;
+}
+
+std::string Simulator::parseSimTotalStepsLog() {
+    std::string str;
+    for (const auto& s : simTotalStepsLog) {
+        str += s;
+    }
+    return str;
 }
