@@ -27,7 +27,7 @@ public:
     void updateCurrentPosition(Step step);
     // Methods to set the environment
     void updateDirtLevel(int num);
-    void updateBatteryLevel(int num);
+    void updateBatteryLevel(float num);
 
     void readHouseFile(const std::string &filePath);
     void run();
@@ -39,14 +39,15 @@ public:
     std::string parseSimTotalStepsLog();
 
 private:
-    int rows, cols, maxSteps, maxBatterySteps;
+    int rows, cols, maxSteps;
+    float maxBatterySteps = -1;
     std::string houseLayoutName;
     std::vector<std::vector<char>> houseLayout;
     bool dockingStationFound = false;
     std::pair<int, int> simDockingStationPosition;
     int totalDirt;
     int simTotalSteps;
-    std::size_t batteryLevel;
+    float batteryLevel;
     std::pair<int, int> simCurrPosition;
     Algorithm algo;
     std::vector<std::string> simTotalStepsLog;

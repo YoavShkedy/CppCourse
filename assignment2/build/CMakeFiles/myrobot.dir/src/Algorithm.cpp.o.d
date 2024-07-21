@@ -847,4 +847,5 @@ CMakeFiles/myrobot.dir/src/Algorithm.cpp.o: \
   /Users/dell/Yoav/CppCourse/assignment2/include/battery_meter.h \
   /Users/dell/Yoav/CppCourse/assignment2/include/wall_sensor.h \
   /Users/dell/Yoav/CppCourse/assignment2/include/dirt_sensor.h \
-  /Users/dell/Yoav/CppCourse/assignment2/src/../include/utils.h
+  /Users/dell/Yoav/CppCourse/assignment2/src/../include/utils.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/thread

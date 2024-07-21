@@ -27,6 +27,7 @@ private:
     std::deque<Step> tripStepsLog;
     std::queue<std::shared_ptr<Vertex>> bfsQueue;
     std::unordered_map<std::pair<int, int>, std::shared_ptr<Vertex>, VertexHash> vertices;
+    std::unordered_map<std::pair<int, int>, int, VertexHash> dirtyPos;
     std::pair<int, int> dockingStation;
     std::pair<int, int> currPosition;
     bool returnToDockingStation = false;

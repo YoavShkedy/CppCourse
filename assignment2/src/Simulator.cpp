@@ -1,4 +1,8 @@
 #include "../include/Simulator.h"
+#include <thread>
+#include <chrono>
+#include <vector>
+#include <cmath>
 
 Simulator::Simulator() : rows(-1), cols(-1), maxSteps(-1), maxBatterySteps(-1), totalDirt(0), simTotalSteps(0),
                          batteryLevel(-1) {}
@@ -42,7 +46,7 @@ int Simulator::dirtLevel() const {
 
 // BatteryMeter implementation
 std::size_t Simulator::getBatteryState() const {
-    return batteryLevel;
+    return std::floor(batteryLevel);
 }
 
 /* change dirt level in simCurrPosition by num */
@@ -54,7 +58,7 @@ int Simulator::getTotalDirt() const {
     return totalDirt;
 }
 
-void Simulator::updateBatteryLevel(int num) {
+void Simulator::updateBatteryLevel(float num) {
     this->batteryLevel += num;
 }
 
@@ -87,8 +91,8 @@ void Simulator::readHouseFile(const std::string &filePath) {
         key.erase(key.find_last_not_of(" \t\n\r\f\v") + 1);
         if (key == "MaxSteps") maxSteps = value;
         else if (key == "MaxBattery") {
-            maxBatterySteps = value;
-            batteryLevel = value;
+            maxBatterySteps = float(value);
+            batteryLevel = float(value);
         } else if (key == "Rows") rows = value;
         else if (key == "Cols") cols = value;
     }
@@ -208,8 +212,8 @@ void Simulator::run() {
             if (simCurrPosition == simDockingStationPosition) {
                 updateBatteryLevel(maxBatterySteps / 20);
                 // prevent over charging the battery
-                if (int(batteryLevel) > maxBatterySteps) {
-                    updateBatteryLevel(maxBatterySteps - int(batteryLevel));
+                if (batteryLevel > maxBatterySteps) {
+                    updateBatteryLevel(maxBatterySteps - batteryLevel);
                 }
                 std::cout << "\nSIMULATOR: Charging; batteryLevel: " << std::to_string(batteryLevel) << std::endl;
             } else { // if not on docking station -> clean()
@@ -270,7 +274,7 @@ void Simulator::printHouseLayoutForSim(const std::string &action) const {
     std::cout << "Max steps allowed: " << maxSteps << std::endl;
     std::cout << "Total Steps Taken: " << simTotalSteps << "\n" << std::endl;
     std::cout << "Action: " << action << std::endl;
-    std::cout << "Battery Level: " << batteryLevel << std::endl;
+    std::cout << "Battery Level: " << getBatteryState() << std::endl;
     std::cout << "Max battery steps: " << maxBatterySteps << std::endl;
     std::cout << "Total Dirt Left: " << totalDirt << "\n" << std::endl;
 
@@ -339,7 +343,7 @@ void Simulator::runWithSim() {
 
         // Print the house layout after each action
         printHouseLayoutForSim(action);
-        std::this_thread::sleep_for(std::chrono::milliseconds (350));
+        std::this_thread::sleep_for(std::chrono::milliseconds(350));
     }
 
     printHouseLayoutForSim("Mission Completed");
