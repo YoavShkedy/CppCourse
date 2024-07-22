@@ -3,7 +3,8 @@
 
 
 Algorithm::Algorithm() : maxSteps(0), wallsSensor(nullptr), dirtSensor(nullptr), batteryMeter(nullptr),
-                         maxBatterySteps(0), totalSteps(0), dockingStation(0, 0), currPosition(0, 0) {
+                         maxBatterySteps(0), totalSteps(0), dockingStation(0, 0), currPosition(0, 0),
+                         prevPosition(0,0) {
     // Create a new Vertex for the docking station
     auto dockingStationVertex = std::make_shared<Vertex>(dockingStation, 0, Step::Stay);
     vertices[dockingStation] = dockingStationVertex;
@@ -61,6 +62,7 @@ Step Algorithm::nextStep() {
         } else {
             relax();
             res = vertices[currPosition]->pai;
+            prevPosition = currPosition;
             updateCurrPosition(res);
             tripStepsLog.push_back(getOppositeStep(res));
             totalSteps++;
@@ -73,11 +75,15 @@ Step Algorithm::nextStep() {
         if (pathToDirtyPoint.empty()) {
             followPathToDirtyPoint = false;
         }
+        prevPosition = currPosition;
         updateCurrPosition(res);
         totalSteps++;
         return res;
     }
-    relax();
+    // relax only after position has changed
+    if (currPosition != prevPosition) {
+        relax();
+    }
     if (int(batteryMeter->getBatteryState()) <= (vertices[currPosition]->d + 1) ||
         (int(maxSteps) - totalSteps) <= (vertices[currPosition]->d + 1)) {
         if (totalSteps == int(maxSteps)) {
@@ -86,6 +92,7 @@ Step Algorithm::nextStep() {
         }
         returnToDockingStation = true;
         res = vertices[currPosition]->pai;
+        prevPosition = currPosition;
         updateCurrPosition(res);
         tripStepsLog.clear();
         tripStepsLog.push_back(getOppositeStep(res));
@@ -100,6 +107,7 @@ Step Algorithm::nextStep() {
         return res;
     }
     res = chooseNeighbor();
+    prevPosition = currPosition;
     updateCurrPosition(res);
     totalSteps++;
     dirtyPos[currPosition] = dirtSensor->dirtLevel();

@@ -24,13 +24,12 @@ private:
     bool firstStep = true;
     int totalSteps;
     std::deque<Step> tripStepsLog;
-    std::queue<std::shared_ptr<Vertex>> bfsQueue;
     std::unordered_map<std::pair<int, int>, std::shared_ptr<Vertex>, VertexHash> vertices;
     std::unordered_map<std::pair<int, int>, int, VertexHash> dirtyPos;
     std::pair<int, int> dockingStation;
     std::pair<int, int> currPosition;
+    std::pair<int, int> prevPosition;
     bool returnToDockingStation = false;
-    [[maybe_unused]] bool returnToLastCleaningPosition = false;
     bool followPathToDirtyPoint = false;
     std::vector<Step> pathToDirtyPoint;
 
