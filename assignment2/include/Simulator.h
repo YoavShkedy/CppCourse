@@ -19,24 +19,10 @@ public:
     // BatteryMeter implementation
     std::size_t getBatteryState() const override;
 
-    int getTotalDirt() const;
-
-    std::pair<int, int> getSimCurrPosition();
-    std::pair<int, int> getSimDockingStationPosition();
-
-    void updateCurrentPosition(Step step);
-    // Methods to set the environment
-    void updateDirtLevel(int num);
-    void updateBatteryLevel(float num);
-
     void readHouseFile(const std::string &filePath);
     void run();
     void runWithSim();
-    void printHouseLayout() const;
-    void printHouseLayoutForSim(const std::string& action) const;
-    void updateSimTotalStepsLog(Step step);
-    void createOutputFile();
-    std::string parseSimTotalStepsLog();
+
 
 private:
     int rows, cols, maxSteps;
@@ -52,6 +38,19 @@ private:
     Algorithm algo;
     std::vector<std::string> simTotalStepsLog;
     std::string input_file_name;
+
+    // private methods:
+    std::pair<int, int> getSimCurrPosition();
+    std::pair<int, int> getSimDockingStationPosition();
+    void updateCurrentPosition(Step step);
+    void updateDirtLevel(int num);
+    void updateBatteryLevel(float num);
+    int getTotalDirt() const;
+    void printHouseLayout() const;
+    void printHouseLayoutForSim(const std::string& action) const;
+    void updateSimTotalStepsLog(Step step);
+    void createOutputFile();
+    std::string parseSimTotalStepsLog();
 };
 
 #endif // SIMULATOR_H

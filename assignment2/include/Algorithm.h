@@ -22,7 +22,6 @@ private:
     const BatteryMeter* batteryMeter;
     size_t maxBatterySteps;
     bool firstStep = true;
-    [[maybe_unused]] int currTripSteps;
     int totalSteps;
     std::deque<Step> tripStepsLog;
     std::queue<std::shared_ptr<Vertex>> bfsQueue;
@@ -35,12 +34,11 @@ private:
     bool followPathToDirtyPoint = false;
     std::vector<Step> pathToDirtyPoint;
 
-    // private functions:
+    // private methods:
     Step moveTo(std::pair<int, int> targetPosition);
     void updateCurrPosition(Step step);
     void relax();
     Step chooseNeighbor();
-    Step navigateTo(std::pair<int, int> targetPosition);
     std::pair<int, int> findClosestDirtyPoint(std::vector<Step>& path);
 };
 

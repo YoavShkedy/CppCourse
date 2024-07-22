@@ -17,6 +17,9 @@
 #include <stdexcept>
 #include <algorithm>
 #include <iterator>
+#include <chrono>
+#include <string>
+#include <cmath>
 
 // Utility function declarations
 Direction getOppositeDirection(Direction dir);

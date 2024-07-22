@@ -1,5 +1,4 @@
-#include <iostream>
-#include <string>
+#include "../include/utils.h"
 #include "../include/Algorithm.h"
 #include "../include/Simulator.h"
 
@@ -13,27 +12,13 @@ int main(int argc, char **argv) {
         simulator.readHouseFile(houseFilePath);
         Algorithm algo;
         simulator.setAlgorithm(algo);
-        simulator.printHouseLayout();
-        std::cout << '\n';
 
-//        simulator.run();
+        //simulator.run();
         simulator.runWithSim();
-
-        std::string dockingStationPosition =
-                "(" + std::to_string(simulator.getSimDockingStationPosition().first) + ", " +
-                std::to_string(simulator.getSimDockingStationPosition().second) + ")";
-        std::string endPosition = "(" + std::to_string(simulator.getSimCurrPosition().first) + ", " +
-                                  std::to_string(simulator.getSimCurrPosition().second) + ")";
-
-        std::cout << '\n' << "Total dirt level: " << simulator.getTotalDirt() << std::endl;
-        std::cout << "End position: " << (endPosition == dockingStationPosition ? "Docking station" : endPosition)
-                  << std::endl;
-    }
-    catch (const std::exception &e) {
+    } catch (const std::exception &e) {
         std::cerr << "Exception: " << e.what() << std::endl;
     } catch (...) {
         std::cerr << "Unknown exception occurred" << std::endl;
     }
-
     return 0;
 }

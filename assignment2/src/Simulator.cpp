@@ -1,8 +1,5 @@
 #include "../include/Simulator.h"
-#include <thread>
-#include <chrono>
-#include <vector>
-#include <cmath>
+
 
 Simulator::Simulator() : rows(-1), cols(-1), maxSteps(-1), maxBatterySteps(-1), totalDirt(0), simTotalSteps(0),
                          batteryLevel(-1) {}
@@ -17,6 +14,7 @@ bool Simulator::isWall(Direction d) const {
             break;
         case Direction::East:
             col++;
+            break;
         case Direction::South:
             row++;
             break;
