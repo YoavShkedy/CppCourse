@@ -190,41 +190,48 @@ std::pair<int, int> Simulator::getSimDockingStationPosition() {
 }
 
 void Simulator::run() {
-    if (simTotalSteps > maxSteps) {
-        throw std::runtime_error("Mission failed: Used maximum number of steps allowed.");
-    }
-    // while mission not completed
-    while (true) {
-        Step simNextStep = algo.nextStep();
-
-        // if the algorithm returns 'Finish' -> break the loop
-        if (simNextStep == Step::Finish) {
-            updateSimTotalStepsLog(simNextStep);
-            break;
-        } // if the battery is empty and not on docking station
-        if (batteryLevel == 0 && simCurrPosition != simDockingStationPosition) {
-            throw std::runtime_error("Run out of battery away from docking station");
+    try {
+        if (simTotalSteps > maxSteps) {
+            throw std::runtime_error("Mission failed: Used maximum number of steps allowed");
         }
-        if (simNextStep == Step::Stay) {
-            // if on docking station -> charge()
-            if (simCurrPosition == simDockingStationPosition) {
-                updateBatteryLevel(maxBatterySteps / 20);
-                // prevent over charging the battery
-                if (batteryLevel > maxBatterySteps) {
-                    setBatteryLevel(maxBatterySteps);
-                }
-            } else { // if not on docking station -> clean()
-                updateBatteryLevel(-1);
-                updateDirtLevel(-1);
-                totalDirt--;
+        // while mission not completed
+        while (true) {
+            if (batteryLevel == 0 && simCurrPosition != simDockingStationPosition) {
+                throw std::runtime_error("Run out of battery away from docking station --1--");
             }
-        } else { // simNextStep != 'Stay'
-            // update the current position according to the step
-            updateCurrentPosition(simNextStep);
-            updateBatteryLevel(-1);
+            Step simNextStep = algo.nextStep();
+
+            // if the algorithm returns 'Finish' -> break the loop
+            if (simNextStep == Step::Finish) {
+                updateSimTotalStepsLog(simNextStep);
+                break;
+            } // if the battery is empty and not on docking station
+            if (batteryLevel == 0 && simCurrPosition != simDockingStationPosition) {
+                throw std::runtime_error("Run out of battery away from docking station --2--");
+            }
+            if (simNextStep == Step::Stay) {
+                // if on docking station -> charge()
+                if (simCurrPosition == simDockingStationPosition) {
+                    updateBatteryLevel(maxBatterySteps / 20);
+                    // prevent over charging the battery
+                    if (batteryLevel > maxBatterySteps) {
+                        setBatteryLevel(maxBatterySteps);
+                    }
+                } else { // if not on docking station -> clean()
+                    updateBatteryLevel(-1);
+                    updateDirtLevel(-1);
+                    totalDirt--;
+                }
+            } else { // simNextStep != 'Stay'
+                // update the current position according to the step
+                updateCurrentPosition(simNextStep);
+                updateBatteryLevel(-1);
+            }
+            updateSimTotalStepsLog(simNextStep);
+            simTotalSteps++;
         }
-        updateSimTotalStepsLog(simNextStep);
-        simTotalSteps++;
+    } catch (const std::exception &e) {
+        std::cerr << "Exception in run(): " << e.what() << std::endl;
     }
     createOutputFile();
     return;
@@ -335,7 +342,7 @@ void Simulator::createOutputFile() {
     // create outputFileName
     std::string outputFileName = "output_" + input_file_name;
     std::ofstream outputFile(outputFileName);
-    if(!outputFile) { // make sure the output file has been created
+    if (!outputFile) { // make sure the output file has been created
         std::string err = "Error opening file: " + outputFileName;
         throw std::runtime_error(err);
     }
@@ -363,7 +370,7 @@ void Simulator::createOutputFile() {
 
 std::string Simulator::parseSimTotalStepsLog() {
     std::string str;
-    for (const auto& s : simTotalStepsLog) {
+    for (const auto &s: simTotalStepsLog) {
         str += s;
     }
     return str;
