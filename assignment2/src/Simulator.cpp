@@ -193,20 +193,14 @@ void Simulator::run() {
     if (simTotalSteps > maxSteps) {
         throw std::runtime_error("Mission failed: Used maximum number of steps allowed.");
     }
-    // Initial print
-    printHouseLayoutForSim("Starting");
-
     // while mission not completed
     while (true) {
         Step simNextStep = algo.nextStep();
 
-        std::string action = getMatchingString(simNextStep);
-
-        // if the algorithm returns 'Finish' -> end run()
+        // if the algorithm returns 'Finish' -> break the loop
         if (simNextStep == Step::Finish) {
             updateSimTotalStepsLog(simNextStep);
-            createOutputFile();
-            return;
+            break;
         } // if the battery is empty and not on docking station
         if (batteryLevel == 0 && simCurrPosition != simDockingStationPosition) {
             throw std::runtime_error("Run out of battery away from docking station");
@@ -231,11 +225,9 @@ void Simulator::run() {
         }
         updateSimTotalStepsLog(simNextStep);
         simTotalSteps++;
-
-        // Print the house layout after each action
-        printHouseLayoutForSim(action);
-        std::this_thread::sleep_for(std::chrono::milliseconds(350));
     }
+    createOutputFile();
+    return;
 }
 
 void Simulator::updateSimTotalStepsLog(Step step) {
@@ -293,55 +285,50 @@ void Simulator::runWithSim() {
     if (simTotalSteps > maxSteps) {
         throw std::runtime_error("Mission failed: Used maximum number of steps allowed.");
     }
-
     // Initial print
     printHouseLayoutForSim("Starting");
 
+    // while mission not completed
     while (true) {
         Step simNextStep = algo.nextStep();
+
         std::string action = getMatchingString(simNextStep);
 
         // if the algorithm returns 'Finish' -> break the loop
         if (simNextStep == Step::Finish) {
+            updateSimTotalStepsLog(simNextStep);
             break;
+        } // if the battery is empty and not on docking station
+        if (batteryLevel == 0 && simCurrPosition != simDockingStationPosition) {
+            throw std::runtime_error("Run out of battery away from docking station");
         }
-
         if (simNextStep == Step::Stay) {
             // if on docking station -> charge()
             if (simCurrPosition == simDockingStationPosition) {
                 updateBatteryLevel(maxBatterySteps / 20);
                 // prevent over charging the battery
-                if (int(batteryLevel) > maxBatterySteps) {
-                    updateBatteryLevel(maxBatterySteps - batteryLevel);
-                }
-                if (int(batteryLevel) < maxBatterySteps) {
-                    // Skip showing the charging process
-                    simTotalSteps++;
-                    simTotalStepsLog.push_back(getMatchingString(simNextStep));
-                    continue;
+                if (batteryLevel > maxBatterySteps) {
+                    setBatteryLevel(maxBatterySteps);
                 }
             } else { // if not on docking station -> clean()
                 updateBatteryLevel(-1);
-                if (dirtLevel() > 0) {
-                    updateDirtLevel(-1);
-                    totalDirt--;
-                }
+                updateDirtLevel(-1);
+                totalDirt--;
             }
         } else { // simNextStep != 'Stay'
             // update the current position according to the step
             updateCurrentPosition(simNextStep);
             updateBatteryLevel(-1);
         }
-
+        updateSimTotalStepsLog(simNextStep);
         simTotalSteps++;
-        simTotalStepsLog.push_back(getMatchingString(simNextStep));
 
         // Print the house layout after each action
         printHouseLayoutForSim(action);
         std::this_thread::sleep_for(std::chrono::milliseconds(350));
     }
-
-    printHouseLayoutForSim("Mission Completed");
+    createOutputFile();
+    return;
 }
 
 void Simulator::createOutputFile() {
@@ -354,13 +341,19 @@ void Simulator::createOutputFile() {
     }
     outputFile << "NumSteps = " << simTotalSteps << std::endl;
     outputFile << "DirtLeft = " << totalDirt << std::endl;
-    std::string status = "FINISHED"; // default value
+    std::string status = "UNKOWN"; // default value
     std::string lastStep = simTotalStepsLog.back();
-
-    if (lastStep == "F" && totalDirt > 0) {
-        status = "WORKING";
-    } else if (lastStep != "F" && (maxSteps - simTotalSteps == 0)) {
+    // determin the status
+    if (lastStep == "F") {
+        if (simCurrPosition == simDockingStationPosition) {
+            status = "FINISHED";
+        } else {
+            status = "DEAD";
+        }
+    } else if (batteryLevel == 0 && simCurrPosition != simDockingStationPosition) {
         status = "DEAD";
+    } else if (simTotalSteps == maxSteps && batteryLevel > 0) {
+        status = "WORKING";
     }
 
     outputFile << "Status = " << status << std::endl;
