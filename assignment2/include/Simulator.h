@@ -45,6 +45,7 @@ private:
     void updateCurrentPosition(Step step);
     void updateDirtLevel(int num);
     void updateBatteryLevel(float num);
+    void setBatteryLevel(float num);
     int getTotalDirt() const;
     void printHouseLayout() const;
     void printHouseLayoutForSim(const std::string& action) const;

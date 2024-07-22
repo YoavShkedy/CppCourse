@@ -13,8 +13,7 @@ int main(int argc, char **argv) {
         Algorithm algo;
         simulator.setAlgorithm(algo);
 
-        //simulator.run();
-        simulator.runWithSim();
+        simulator.run();
     } catch (const std::exception &e) {
         std::cerr << "Exception: " << e.what() << std::endl;
     } catch (...) {

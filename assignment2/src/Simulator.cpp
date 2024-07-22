@@ -60,6 +60,10 @@ void Simulator::updateBatteryLevel(float num) {
     this->batteryLevel += num;
 }
 
+void Simulator::setBatteryLevel(float num) {
+    this->batteryLevel = num;
+}
+
 void Simulator::updateCurrentPosition(Step step) {
     simCurrPosition = moveInDirection(simCurrPosition, getMatchingDirection(step));
 }
@@ -186,15 +190,17 @@ std::pair<int, int> Simulator::getSimDockingStationPosition() {
 }
 
 void Simulator::run() {
-    std::cout << "SIMULATOR: DockingStationPosition: (" + std::to_string(simCurrPosition.first) + ", " +
-                 std::to_string(simCurrPosition.second) + ")" << '\n' << std::endl;
+    if (simTotalSteps > maxSteps) {
+        throw std::runtime_error("Mission failed: Used maximum number of steps allowed.");
+    }
+    // Initial print
+    printHouseLayoutForSim("Starting");
 
     // while mission not completed
-    /* OLD CONDITION: while (totalDirt > 0 || simCurrPosition != simDockingStationPosition) { */
-    while (true) { // NEW CONDITION: only stop when the next step is 'Finish'
+    while (true) {
         Step simNextStep = algo.nextStep();
 
-        std::cout << "SIMULATOR: nextStep: " + getMatchingString(simNextStep) << std::endl;
+        std::string action = getMatchingString(simNextStep);
 
         // if the algorithm returns 'Finish' -> end run()
         if (simNextStep == Step::Finish) {
@@ -211,33 +217,24 @@ void Simulator::run() {
                 updateBatteryLevel(maxBatterySteps / 20);
                 // prevent over charging the battery
                 if (batteryLevel > maxBatterySteps) {
-                    updateBatteryLevel(maxBatterySteps - batteryLevel);
+                    setBatteryLevel(maxBatterySteps);
                 }
-                std::cout << "\nSIMULATOR: Charging; batteryLevel: " << std::to_string(batteryLevel) << std::endl;
             } else { // if not on docking station -> clean()
                 updateBatteryLevel(-1);
                 updateDirtLevel(-1);
                 totalDirt--;
-
-                std::cout << "\nSIMULATOR: Cleaning; currPositionDirtLevel: " <<
-                          houseLayout[simCurrPosition.first][simCurrPosition.second] << std::endl;
-                std::cout << "SIMULATOR: currPosition: (" + std::to_string(simCurrPosition.first) + ", " +
-                             std::to_string(simCurrPosition.second) + ")" << std::endl;
-                std::cout << "SIMULATOR: batteryLevel: " + std::to_string(batteryLevel) << std::endl;
             }
         } else { // simNextStep != 'Stay'
             // update the current position according to the step
             updateCurrentPosition(simNextStep);
             updateBatteryLevel(-1);
-
-            std::cout << "SIMULATOR: currPosition: (" + std::to_string(simCurrPosition.first) + ", " +
-                         std::to_string(simCurrPosition.second) + ")" << std::endl;
-            std::cout << "SIMULATOR: batteryLevel: " + std::to_string(batteryLevel) << std::endl;
         }
         updateSimTotalStepsLog(simNextStep);
         simTotalSteps++;
 
-        std::cout << "SIMULATOR: simTotalSteps: " + std::to_string(simTotalSteps) << '\n' << std::endl;
+        // Print the house layout after each action
+        printHouseLayoutForSim(action);
+        std::this_thread::sleep_for(std::chrono::milliseconds(350));
     }
 }
 
