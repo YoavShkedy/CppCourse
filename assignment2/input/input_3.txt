@@ -7,7 +7,7 @@ WWWWWWWWWWWW 0
 W D        W 1
 W 123456789W 2
 W          W
-W          W
-W          W
+WWWW       W
+W22W       W
 WWWWWWWWWWWW 3
 012345678901
