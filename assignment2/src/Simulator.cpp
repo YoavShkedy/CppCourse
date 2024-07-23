@@ -190,14 +190,13 @@ std::pair<int, int> Simulator::getSimDockingStationPosition() {
 }
 
 void Simulator::run() {
-    try {
-        if (simTotalSteps > maxSteps) {
-            throw std::runtime_error("Mission failed: Used maximum number of steps allowed");
-        }
-        // while mission not completed
+    try { // while mission not completed
         while (true) {
-            if (batteryLevel == 0 && simCurrPosition != simDockingStationPosition) {
-                throw std::runtime_error("Run out of battery away from docking station --1--");
+            if (simTotalSteps > maxSteps) {
+                throw std::runtime_error("Exception in Simulator::run(): Executed more than the maximum allowed number of steps");
+            } // if the battery is empty and not on docking station
+            else if (batteryLevel == 0 && simCurrPosition != simDockingStationPosition) {
+                throw std::runtime_error("Exception in Simulator::run(): Run out of battery away from docking station");
             }
             Step simNextStep = algo.nextStep();
 
@@ -205,25 +204,22 @@ void Simulator::run() {
             if (simNextStep == Step::Finish) {
                 updateSimTotalStepsLog(simNextStep);
                 break;
-            } // if the battery is empty and not on docking station
-            if (batteryLevel == 0 && simCurrPosition != simDockingStationPosition) {
-                throw std::runtime_error("Run out of battery away from docking station --2--");
             }
             if (simNextStep == Step::Stay) {
-                // if on docking station -> charge()
+                // if on docking station -> charge
                 if (simCurrPosition == simDockingStationPosition) {
                     updateBatteryLevel(maxBatterySteps / 20);
                     // prevent over charging the battery
                     if (batteryLevel > maxBatterySteps) {
                         setBatteryLevel(maxBatterySteps);
                     }
-                } else { // if not on docking station -> clean()
+                } else { // if not on docking station -> clean
                     updateBatteryLevel(-1);
                     updateDirtLevel(-1);
                     totalDirt--;
                 }
             } else { // simNextStep != 'Stay'
-                // update the current position according to the step
+                // update the current position according to the step taken
                 updateCurrentPosition(simNextStep);
                 updateBatteryLevel(-1);
             }
@@ -231,10 +227,9 @@ void Simulator::run() {
             simTotalSteps++;
         }
     } catch (const std::exception &e) {
-        std::cerr << "Exception in run(): " << e.what() << std::endl;
+        std::cerr << "Exception in Simulator::run(): " << e.what() << std::endl;
     }
     createOutputFile();
-    return;
 }
 
 void Simulator::updateSimTotalStepsLog(Step step) {
