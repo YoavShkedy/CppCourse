@@ -1,8 +1,4 @@
 #include "Algorithm_a.h"
-#include "utils.h"
-#include "../common/enums.h"
-#include "../common/AbstractAlgorithm.h"
-#include "AlgorithmRegistration.h"
 
 Algorithm_a::Algorithm_a() : maxSteps(0), wallsSensor(nullptr), dirtSensor(nullptr), batteryMeter(nullptr),
                          maxBatterySteps(0), totalSteps(0), dockingStation(0, 0), currPosition(0, 0),
@@ -224,4 +220,4 @@ std::pair<int, int> Algorithm_a::findClosestDirtyPoint(std::vector<Step> &path) 
     return closestDirtyPoint;
 }
 
-REGISTER_ALGORITHM(Algorithm_a)
+REGISTER_ALGORITHM(Algorithm_a);

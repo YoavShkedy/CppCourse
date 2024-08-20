@@ -1,0 +1,3 @@
+/Users/dell/Yoav/CppCourse/assignment3/build/CMakeFiles/myrobot.dir
+/Users/dell/Yoav/CppCourse/assignment3/build/CMakeFiles/edit_cache.dir
+/Users/dell/Yoav/CppCourse/assignment3/build/CMakeFiles/rebuild_cache.dir

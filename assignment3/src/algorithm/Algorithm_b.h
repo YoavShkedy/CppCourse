@@ -1,6 +1,14 @@
 #ifndef ASSIGNMENT3_ALGORITHM_B_H
 #define ASSIGNMENT3_ALGORITHM_B_H
 
+#include "../common/AbstractAlgorithm.h"
+#include "../common/AlgorithmRegistrar.h"
+#include "../common/BatteryMeter.h"
+#include "../common/DirtSensor.h"
+#include "../common/WallSensor.h"
+#include "../common/enums.h"
+#include "AlgorithmRegistration.h"
+#include "utils.h"
 
 class Algorithm_b : public AbstractAlgorithm {
 public:
