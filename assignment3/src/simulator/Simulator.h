@@ -2,16 +2,17 @@
 #define SIMULATOR_H
 
 #include "utils.h"
-#include "wall_sensor.h"
-#include "dirt_sensor.h"
-#include "battery_meter.h"
-#include "Algorithm.h"
+#include "Algorithm_a.h"
+#include "Algorithm_b.h"
+#include "WallSensor.h"
+#include "DirtSensor.h"
+#include "BatteryMeter.h"
 
 
 class Simulator : public WallsSensor, public DirtSensor, public BatteryMeter {
 public:
     Simulator();
-    void setAlgorithm(Algorithm algorithm);
+    void setAlgorithm(std::unique_ptr<AbstractAlgorithm> algorithm);
     // WallSensor implementation
     bool isWall(Direction d) const override;
     // DirtSensor implementation
@@ -35,7 +36,7 @@ private:
     int simTotalSteps;
     float batteryLevel;
     std::pair<int, int> simCurrPosition;
-    Algorithm algo;
+    std::unique_ptr<AbstractAlgorithm> algo;
     std::vector<std::string> simTotalStepsLog;
     std::string input_file_name;
 

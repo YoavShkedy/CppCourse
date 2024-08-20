@@ -1,14 +1,16 @@
 #ifndef ASSIGNMENT3_ALGORITHM_B_H
 #define ASSIGNMENT3_ALGORITHM_B_H
 
-#include "../common/AbstractAlgorithm.h"
-#include "../common/AlgorithmRegistrar.h"
-#include "../common/BatteryMeter.h"
-#include "../common/DirtSensor.h"
-#include "../common/WallSensor.h"
-#include "../common/enums.h"
-#include "AlgorithmRegistration.h"
 #include "utils.h"
+#include "enums.h"
+#include "DirtSensor.h"
+#include "WallSensor.h"
+#include "BatteryMeter.h"
+#include "AbstractAlgorithm.h"
+#include "AlgorithmRegistrar.h"
+#include "AlgorithmRegistration.h"
+
+#include <deque>
 
 class Algorithm_b : public AbstractAlgorithm {
 public:
@@ -37,7 +39,7 @@ private:
     std::pair<int, int> lastPosition;
     bool returnToDockingStation = false;
     bool followPathToLastPoint = false;
-    std::dequeue<Step> pathToLastPoint;
+    std::deque<Step> pathToLastPoint;
 
     // private methods:
     Step moveTo(std::pair<int, int> targetPosition);

@@ -1,4 +1,4 @@
-#include "../include/Simulator.h"
+#include "Simulator.h"
 
 
 Simulator::Simulator() : rows(-1), cols(-1), maxSteps(-1), maxBatterySteps(-1), totalDirt(0), simTotalSteps(0),
@@ -73,7 +73,7 @@ void Simulator::readHouseFile(const std::string &filePath) {
     if (!file.is_open()) throw std::runtime_error("Could not open file");
 
     /* extract the input file name from the path, to be used in the output file name */
-    std::filesystem::path inputPath(filePath);
+    std::__fs::filesystem::path inputPath(filePath);
     input_file_name = inputPath.filename().string();
 
     /* initialize houseLayoutName, MaxSteps, MaxBattery, Rows, Cols */
@@ -173,12 +173,12 @@ void Simulator::printHouseLayout() const {
     std::cout << wall << std::endl;
 }
 
-void Simulator::setAlgorithm(Algorithm algorithm) {
-    this->algo = algorithm;
-    this->algo.setMaxSteps(maxSteps);
-    this->algo.setWallsSensor(*this);
-    this->algo.setDirtSensor(*this);
-    this->algo.setBatteryMeter(*this);
+void Simulator::setAlgorithm(std::unique_ptr<AbstractAlgorithm> algorithm) {
+    this->algo = std::move(algorithm);
+    this->algo->setMaxSteps(maxSteps);
+    this->algo->setWallsSensor(*this);
+    this->algo->setDirtSensor(*this);
+    this->algo->setBatteryMeter(*this);
 }
 
 std::pair<int, int> Simulator::getSimCurrPosition() {
@@ -198,7 +198,7 @@ void Simulator::run() {
             else if (batteryLevel == 0 && simCurrPosition != simDockingStationPosition) {
                 throw std::runtime_error("Exception in Simulator::run(): Run out of battery away from docking station");
             }
-            Step simNextStep = algo.nextStep();
+            Step simNextStep = this->algo->nextStep();
 
             // if the algorithm returns 'Finish' -> break the loop
             if (simNextStep == Step::Finish) {
@@ -292,7 +292,7 @@ void Simulator::runWithSim() {
 
     // while mission not completed
     while (true) {
-        Step simNextStep = algo.nextStep();
+        Step simNextStep = this->algo->nextStep();
 
         std::string action = getMatchingString(simNextStep);
 
@@ -305,7 +305,7 @@ void Simulator::runWithSim() {
             throw std::runtime_error("Run out of battery away from docking station");
         }
         if (simNextStep == Step::Stay) {
-            // if on docking station -> charge()
+            // if on docking station -> charge
             if (simCurrPosition == simDockingStationPosition) {
                 updateBatteryLevel(maxBatterySteps / 20);
                 // prevent over charging the battery

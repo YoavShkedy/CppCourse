@@ -8,7 +8,6 @@
 #include <thread>
 #include <vector>
 #include <utility> // For std::pair
-#include <boost/functional/hash.hpp> // For boost::hash
 #include <limits>
 #include <iostream>
 #include <fstream>
@@ -20,6 +19,7 @@
 #include <chrono>
 #include <string>
 #include <cmath>
+#include <boost/functional/hash.hpp> // For boost::hash
 
 // Utility function declarations
 Direction getOppositeDirection(Direction dir);

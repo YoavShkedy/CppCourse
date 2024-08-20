@@ -51,19 +51,19 @@ Step Algorithm_b::nextStep() {
                 return res;
             } else { // Robot is charged. Navigate to the last position the robot was at
                 returnToDockingStation = false;
-                std::vector<Step> path = pathToLastPoint;
+                std::deque<Step> path = pathToLastPoint;
                 // we need at least 2 * path.size() + 1 steps to be able to clean the last position
                 if (2 * path.size() + 1 > maxSteps - totalSteps) {
                     res = Step::Finish;
                     return res;
                 } else if (lastPosition != dockingStation) {
-                    followpathToLastPoint = true;
+                    followPathToLastPoint = true;
                 }
             }
         } else {
             relax();
             res = vertices[currPosition]->pai;
-            pathToLastPoint.push_front(getOppositeStep(res))
+            pathToLastPoint.push_front(getOppositeStep(res));
             prevPosition = currPosition;
             updateCurrPosition(res);
             tripStepsLog.push_back(getOppositeStep(res));
@@ -71,11 +71,11 @@ Step Algorithm_b::nextStep() {
             return res;
         }
     }
-    if (followpathToLastPoint && !pathToLastPoint.empty()) {
+    if (followPathToLastPoint && !pathToLastPoint.empty()) {
         res = pathToLastPoint.front();
         pathToLastPoint.erase(pathToLastPoint.begin());
         if (pathToLastPoint.empty()) {
-            followpathToLastPoint = false;
+            followPathToLastPoint = false;
         }
         prevPosition = currPosition;
         updateCurrPosition(res);
@@ -191,4 +191,4 @@ Step Algorithm_b::moveTo(std::pair<int, int> targetPosition) {
     return Step::Stay;
 }
 
-REGISTER_ALGORITHM(Algorithm_b)
+REGISTER_ALGORITHM(Algorithm_b);
