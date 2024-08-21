@@ -29,8 +29,8 @@ int main(int argc, char **argv) {
     try {
         std::vector<void *> algo_libs;
         register_libs(argv[1], algo_libs);
-        if (argc < 2) {
-            throw std::runtime_error("Usage: myrobot <house_input_file>");
+        if (argc < 3) {
+            throw std::runtime_error("Usage: myrobot <house_path>, <algorithm_path>");
         }
         std::string houseFilePath = argv[1];
         Simulator simulator;

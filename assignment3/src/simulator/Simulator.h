@@ -12,16 +12,22 @@
 class Simulator : public WallsSensor, public DirtSensor, public BatteryMeter {
 public:
     Simulator();
+
     void setAlgorithm(std::unique_ptr<AbstractAlgorithm> algorithm);
+
     // WallSensor implementation
     bool isWall(Direction d) const override;
+
     // DirtSensor implementation
     int dirtLevel() const override;
+
     // BatteryMeter implementation
     std::size_t getBatteryState() const override;
 
     void readHouseFile(const std::string &filePath);
+
     void run();
+
     void runWithSim();
 
 
@@ -42,17 +48,30 @@ private:
 
     // private methods:
     std::pair<int, int> getSimCurrPosition();
+
     std::pair<int, int> getSimDockingStationPosition();
+
     void updateCurrentPosition(Step step);
+
     void updateDirtLevel(int num);
+
     void updateBatteryLevel(float num);
+
     void setBatteryLevel(float num);
+
     int getTotalDirt() const;
+
     void printHouseLayout() const;
-    void printHouseLayoutForSim(const std::string& action) const;
+
+    void printHouseLayoutForSim(const std::string &action) const;
+
     void updateSimTotalStepsLog(Step step);
+
     void createOutputFile();
+
     std::string parseSimTotalStepsLog();
-    std::string getAlgorithmName(const std::unique_ptr<AbstractAlgorithm>& algorithm);
+
+    std::string getAlgorithmName(const std::unique_ptr<AbstractAlgorithm> &algorithm);
+};
 
 #endif // SIMULATOR_H
