@@ -1,29 +1,46 @@
-cmake_minimum_required(VERSION 3.23)
-project(assignment3)
+cmake_minimum_required(VERSION 3.16)
 
-# Specify C++ standard
-set(CMAKE_CXX_STANDARD 17)
+project(my_robot)
+
+# Set C++ standard
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 
-# Include directories
-include_directories(src/common)
-include_directories(src/algorithm)
-include_directories(src/utils)
+# Set linker flags if necessary
+SET(CMAKE_EXE_LINKER_FLAGS "-rdynamic")
+
+# Include subdirectories for algorithms
+add_subdirectory(Algorithm_206448649_314939398_A)
+add_subdirectory(Algorithm_206448649_314939398_B)
+
+# Set paths for common directories
+set(SIM_DIR ${PROJECT_SOURCE_DIR}/simulator)
+set(COMMON_DIR ${PROJECT_SOURCE_DIR}/common)
+
+# Create the executable
+add_executable(${PROJECT_NAME}
+        main.cpp
+        ${SIM_DIR}/Simulator.cpp
+        ${SIM_DIR}/AlgorithmRegistrar.cpp
+        )
+
+# Include directories specific to the target
+target_include_directories(${PROJECT_NAME} PRIVATE
+        ${SIM_DIR}
+        ${COMMON_DIR}
+        )
+
+# Link libraries specific to the target
+target_link_libraries(${PROJECT_NAME} PRIVATE
+        Algorithm_206448649_314939398_A
+        Algorithm_206448649_314939398_B
+        dl
+        pthread
+        )
 
 # Set compiler flags
 add_compile_options(-Wall -Wextra -Werror -pedantic)
 
-# Find Boost
+# Find Boost and link it to the target
 find_package(Boost REQUIRED)
-# Include Boost directories
-include_directories(${Boost_INCLUDE_DIRS})
-
-# Add executable
-add_executable(myrobot
-        src/simulator/main.cpp
-        src/simulator/Simulator.cpp
-        src/simulator/AlgorithmRegistrar.cpp
-        src/Algorithm_206448649_314939398_A/Algorithm_206448649_314939398_A.cpp
-        src/Algorithm_206448649_314939398_B/Algorithm_206448649_314939398_B.cpp
-        src/utils/utils.cpp
-        )
+target_include_directories(${PROJECT_NAME} PRIVATE ${Boost_INCLUDE_DIRS})
