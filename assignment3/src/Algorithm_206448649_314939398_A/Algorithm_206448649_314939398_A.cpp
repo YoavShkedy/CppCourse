@@ -1,36 +1,31 @@
-#include "Algorithm_314939398.h"
+#include "Algorithm_206448649_314939398_A.h"
 
-#include <algorithm>  // for std::shuffle
-#include <random>     // for std::default_random_engine
-#include <chrono>     // for std::chrono::system_clock
-
-
-Algorithm_314939398::Algorithm_314939398() : maxSteps(0), wallsSensor(nullptr), dirtSensor(nullptr), batteryMeter(nullptr),
-                                             maxBatterySteps(0), totalSteps(0), dockingStation(0, 0), currPosition(0, 0),
-                                             prevPosition(0, 0) {
+Algorithm_206448649_314939398_A::Algorithm_206448649_314939398_A() : maxSteps(0), wallsSensor(nullptr), dirtSensor(nullptr), batteryMeter(nullptr),
+                                                                     maxBatterySteps(0), totalSteps(0), dockingStation(0, 0), currPosition(0, 0),
+                                                                     prevPosition(0, 0) {
     // Create a new Vertex for the docking station
     auto dockingStationVertex = std::make_shared<Vertex>(dockingStation, 0, Step::Stay);
     vertices[dockingStation] = dockingStationVertex;
     dirtyPos[dockingStation] = 0;
 }
 
-void Algorithm_314939398::setMaxSteps(std::size_t maxSteps) {
+void Algorithm_206448649_314939398_A::setMaxSteps(std::size_t maxSteps) {
     this->maxSteps = maxSteps;
 }
 
-void Algorithm_314939398::setWallsSensor(const WallsSensor &wallsSensor) {
+void Algorithm_206448649_314939398_A::setWallsSensor(const WallsSensor &wallsSensor) {
     this->wallsSensor = &wallsSensor;
 }
 
-void Algorithm_314939398::setDirtSensor(const DirtSensor &dirtSensor) {
+void Algorithm_206448649_314939398_A::setDirtSensor(const DirtSensor &dirtSensor) {
     this->dirtSensor = &dirtSensor;
 }
 
-void Algorithm_314939398::setBatteryMeter(const BatteryMeter &batteryMeter) {
+void Algorithm_206448649_314939398_A::setBatteryMeter(const BatteryMeter &batteryMeter) {
     this->batteryMeter = &batteryMeter;
 }
 
-Step Algorithm_314939398::nextStep() {
+Step Algorithm_206448649_314939398_A::nextStep() {
     Step res;
     if (firstStep) {
         firstStep = false;
@@ -49,21 +44,22 @@ Step Algorithm_314939398::nextStep() {
                 res = Step::Stay;
                 totalSteps++;
                 return res;
-            } else { // Robot is charged. Navigate to the last position the robot was at
+            } else { // Robot is charged. Navigate to the closest dirty position
                 returnToDockingStation = false;
-                std::deque<Step> path = pathToLastPoint;
-                // we need at least 2 * path.size() + 1 steps to be able to clean the last position
+                std::vector<Step> path;
+                auto closestDirtyPoint = findClosestDirtyPoint(path);
+                // we need at least 2 * path.size() + 1 steps to be able to clean the closestDirtyPoint
                 if (2 * path.size() + 1 > maxSteps - totalSteps) {
                     res = Step::Finish;
                     return res;
-                } else if (lastPosition != dockingStation) {
-                    followPathToLastPoint = true;
+                } else if (closestDirtyPoint != dockingStation) {
+                    pathToDirtyPoint = path;
+                    followPathToDirtyPoint = true;
                 }
             }
         } else {
             relax();
             res = vertices[currPosition]->pai;
-            pathToLastPoint.push_front(getOppositeStep(res));
             prevPosition = currPosition;
             updateCurrPosition(res);
             tripStepsLog.push_back(getOppositeStep(res));
@@ -71,11 +67,11 @@ Step Algorithm_314939398::nextStep() {
             return res;
         }
     }
-    if (followPathToLastPoint && !pathToLastPoint.empty()) {
-        res = pathToLastPoint.front();
-        pathToLastPoint.erase(pathToLastPoint.begin());
-        if (pathToLastPoint.empty()) {
-            followPathToLastPoint = false;
+    if (followPathToDirtyPoint && !pathToDirtyPoint.empty()) {
+        res = pathToDirtyPoint.front();
+        pathToDirtyPoint.erase(pathToDirtyPoint.begin());
+        if (pathToDirtyPoint.empty()) {
+            followPathToDirtyPoint = false;
         }
         prevPosition = currPosition;
         updateCurrPosition(res);
@@ -94,7 +90,6 @@ Step Algorithm_314939398::nextStep() {
         }
         returnToDockingStation = true;
         res = vertices[currPosition]->pai;
-        lastPosition = currPosition;
         prevPosition = currPosition;
         updateCurrPosition(res);
         tripStepsLog.clear();
@@ -118,11 +113,11 @@ Step Algorithm_314939398::nextStep() {
     return res;
 }
 
-void Algorithm_314939398::updateCurrPosition(Step step) {
+void Algorithm_206448649_314939398_A::updateCurrPosition(Step step) {
     currPosition = moveInDirection(currPosition, getMatchingDirection(step));
 }
 
-void Algorithm_314939398::relax() {
+void Algorithm_206448649_314939398_A::relax() {
     auto currVertex = vertices[currPosition];
     currVertex->vertexDirtLevel = dirtSensor->dirtLevel();
     currVertex->visited = true;
@@ -159,19 +154,10 @@ void Algorithm_314939398::relax() {
     }
 }
 
-Step Algorithm_314939398::chooseNeighbor() {
-    std::vector<Direction> directions = {Direction::North, Direction::East, Direction::South, Direction::West};
-
-    // Create a random number generator
-    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    std::default_random_engine generator(seed);
-
-    // Shuffle the directions
-    std::shuffle(directions.begin(), directions.end(), generator);
-
+Step Algorithm_206448649_314939398_A::chooseNeighbor() {
     Direction direction;
     int maxDirtLevel = -1;
-    for (Direction dir: directions) {
+    for (Direction dir: {Direction::North, Direction::East, Direction::South, Direction::West}) {
         auto newPosition = moveInDirection(currPosition, dir);
         if (!wallsSensor->isWall(dir)) {
             if (vertices[newPosition]->vertexDirtLevel > maxDirtLevel) {
@@ -183,7 +169,7 @@ Step Algorithm_314939398::chooseNeighbor() {
     return getMatchingStep(direction);
 }
 
-Step Algorithm_314939398::moveTo(std::pair<int, int> targetPosition) {
+Step Algorithm_206448649_314939398_A::moveTo(std::pair<int, int> targetPosition) {
     if (currPosition.first < targetPosition.first) return Step::South;
     if (currPosition.first > targetPosition.first) return Step::North;
     if (currPosition.second < targetPosition.second) return Step::East;
@@ -191,6 +177,50 @@ Step Algorithm_314939398::moveTo(std::pair<int, int> targetPosition) {
     return Step::Stay;
 }
 
-extern "C" {
-REGISTER_ALGORITHM(Algorithm_314939398);
+std::pair<int, int> Algorithm_206448649_314939398_A::findClosestDirtyPoint(std::vector<Step> &path) {
+    std::queue<std::pair<int, int>> q;
+    std::unordered_map<std::pair<int, int>, bool, VertexHash> visited;
+    std::unordered_map<std::pair<int, int>, std::pair<int, int>, VertexHash> parent;
+    std::unordered_map<std::pair<int, int>, int, VertexHash> distance;
+
+    q.push(dockingStation);
+    visited[dockingStation] = true;
+    distance[dockingStation] = 0;
+
+    std::pair<int, int> closestDirtyPoint = dockingStation;
+    int maxDirtLevel = 0;
+    bool foundClosest = false;
+
+    while (!q.empty() && !foundClosest) {
+        size_t size = q.size();  // Number of nodes at the current distance level
+        for (int i = 0; i < int(size); ++i) {
+            auto current = q.front();
+            q.pop();
+            if (dirtyPos[current] > maxDirtLevel) {
+                closestDirtyPoint = current;
+                maxDirtLevel = dirtyPos[current];
+                foundClosest = true;
+            }
+            for (const auto &neighbor: vertices[current]->neighbors) {
+                if (!visited[neighbor]) {
+                    visited[neighbor] = true;
+                    parent[neighbor] = current;
+                    distance[neighbor] = distance[current] + 1;
+                    q.push(neighbor);
+                }
+            }
+        }
+    }
+    std::pair<int, int> step = closestDirtyPoint;
+    while (step != dockingStation) {
+        auto parentStep = parent[step];
+        path.insert(path.begin(), moveTo(step));
+        step = parentStep;
+    }
+    return closestDirtyPoint;
 }
+
+extern "C" {
+REGISTER_ALGORITHM(Algorithm_206448649_314939398_A);
+}
+

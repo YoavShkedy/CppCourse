@@ -75,7 +75,7 @@ void Simulator::readHouseFile(const std::string &filePath) {
     if (!file.is_open()) throw std::runtime_error("Could not open file");
 
     /* extract the input file name from the path, to be used in the output file name */
-    std::__fs::filesystem::path inputPath(filePath);
+    std::filesystem::path inputPath(filePath);
     input_file_name = inputPath.filename().string();
 
     /* initialize houseLayoutName, MaxSteps, MaxBattery, Rows, Cols */

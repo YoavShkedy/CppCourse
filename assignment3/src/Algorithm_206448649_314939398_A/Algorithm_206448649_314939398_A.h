@@ -1,5 +1,5 @@
-#ifndef ASSIGNMENT3_ALGORITHM_314939398_H
-#define ASSIGNMENT3_ALGORITHM_314939398_H
+#ifndef ASSIGNMENT3_ALGORITHM_206448649_314939398_A_H
+#define ASSIGNMENT3_ALGORITHM_206448649_314939398_A_H
 
 #include "utils.h"
 #include "enums.h"
@@ -10,12 +10,9 @@
 #include "AlgorithmRegistrar.h"
 #include "AlgorithmRegistration.h"
 
-#include <deque>
-
-class Algorithm_314939398 : public AbstractAlgorithm {
+class Algorithm_206448649_314939398_A : public AbstractAlgorithm {
 public:
-    Algorithm_314939398();
-
+    Algorithm_206448649_314939398_A();
     void setMaxSteps(size_t maxSteps) override;
     void setWallsSensor(const WallsSensor& wallsSensor) override;
     void setDirtSensor(const DirtSensor& dirtSensor) override;
@@ -36,10 +33,9 @@ private:
     std::pair<int, int> dockingStation;
     std::pair<int, int> currPosition;
     std::pair<int, int> prevPosition;
-    std::pair<int, int> lastPosition;
     bool returnToDockingStation = false;
-    bool followPathToLastPoint = false;
-    std::deque<Step> pathToLastPoint;
+    bool followPathToDirtyPoint = false;
+    std::vector<Step> pathToDirtyPoint;
 
     // private methods:
     Step moveTo(std::pair<int, int> targetPosition);
@@ -51,4 +47,4 @@ private:
 
 
 
-#endif //ASSIGNMENT3_ALGORITHM_314939398_H
+#endif //ASSIGNMENT3_ALGORITHM_206448649_314939398_A_H
