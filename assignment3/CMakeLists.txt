@@ -22,7 +22,7 @@ add_executable(myrobot
         src/simulator/main.cpp
         src/simulator/Simulator.cpp
         src/simulator/AlgorithmRegistrar.cpp
-        src/algorithm/Algorithm_a.cpp
-        src/algorithm/Algorithm_b.cpp
+        src/Algorithm_206448649/Algorithm_206448649.cpp
+        src/Algorithm_314939398/Algorithm_314939398.cpp
         src/utils/utils.cpp
         )

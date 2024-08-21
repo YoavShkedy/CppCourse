@@ -1,4 +1,6 @@
 #include "Simulator.h"
+#include <typeinfo>
+#include <cxxabi.h> // Required for demangling (GCC/Clang specific)
 
 
 Simulator::Simulator() : rows(-1), cols(-1), maxSteps(-1), maxBatterySteps(-1), totalDirt(0), simTotalSteps(0),
@@ -78,9 +80,9 @@ void Simulator::readHouseFile(const std::string &filePath) {
 
     /* initialize houseLayoutName, MaxSteps, MaxBattery, Rows, Cols */
     std::string line;
-    if (getline(file, houseLayoutName)) {
+    /*if (getline(file, houseLayoutName)) {
         //std::cout << "Layout Name: " << houseLayoutName << std::endl; // For debugging
-    }
+    }*/
     for (int i = 0; i < 4; i++) {
         if (!getline(file, line)) {
             throw std::runtime_error("File missing information");
@@ -174,6 +176,10 @@ void Simulator::printHouseLayout() const {
 }
 
 void Simulator::setAlgorithm(std::unique_ptr<AbstractAlgorithm> algorithm) {
+    if (algorithm == nullptr) {
+        throw std::runtime_error(
+                "Exception in Simulator::setAlgorithm(): The given Algorithm pointer == nullptr");
+    }
     this->algo = std::move(algorithm);
     this->algo->setMaxSteps(maxSteps);
     this->algo->setWallsSensor(*this);
@@ -193,7 +199,8 @@ void Simulator::run() {
     try { // while mission not completed
         while (true) {
             if (simTotalSteps > maxSteps) {
-                throw std::runtime_error("Exception in Simulator::run(): Executed more than the maximum allowed number of steps");
+                throw std::runtime_error(
+                        "Exception in Simulator::run(): Executed more than the maximum allowed number of steps");
             } // if the battery is empty and not on docking station
             else if (batteryLevel == 0 && simCurrPosition != simDockingStationPosition) {
                 throw std::runtime_error("Exception in Simulator::run(): Run out of battery away from docking station");
@@ -335,7 +342,8 @@ void Simulator::runWithSim() {
 
 void Simulator::createOutputFile() {
     // create outputFileName
-    std::string outputFileName = "output_" + input_file_name;
+    std::string algorithmName = getAlgorithmName(algo);
+    std::string outputFileName = input_file_name + "-" + algorithmName;
     std::ofstream outputFile(outputFileName);
     if (!outputFile) { // make sure the output file has been created
         std::string err = "Error opening file: " + outputFileName;
@@ -345,7 +353,7 @@ void Simulator::createOutputFile() {
     outputFile << "DirtLeft = " << totalDirt << std::endl;
     std::string status = "UNKOWN"; // default value
     std::string lastStep = simTotalStepsLog.back();
-    // determin the status
+    // determine the status
     if (lastStep == "F") {
         if (simCurrPosition == simDockingStationPosition) {
             status = "FINISHED";
@@ -359,6 +367,25 @@ void Simulator::createOutputFile() {
     }
 
     outputFile << "Status = " << status << std::endl;
+
+    std::string inDock = (simCurrPosition == simDockingStationPosition) ? "TRUE" : "FALSE";
+    outputFile << "InDock = " << inDock << std::endl;
+
+    int score;
+    if (status == "DEAD") {
+        score = maxSteps + totalDirt * 300 + 2000;
+    }
+    else if (status == "FINISHED" && inDock == "FALSE") {
+        score = maxSteps + totalDirt * 300 + 3000;
+    }
+    else if (inDock == "TRUE") {
+        score = simTotalSteps + totalDirt * 300;
+    }
+    else {
+        score = simTotalSteps + totalDirt * 300 + 1000;
+    }
+    outputFile << "Score = " << score << std::endl;
+
     std::string steps_log = parseSimTotalStepsLog();
     outputFile << "Steps: " << steps_log << std::endl;
 }
@@ -369,4 +396,26 @@ std::string Simulator::parseSimTotalStepsLog() {
         str += s;
     }
     return str;
+}
+
+std::string getAlgorithmName(const std::unique_ptr<AbstractAlgorithm> &algorithm) {
+    if (!algorithm) {
+        throw std::runtime_error("Algorithm pointer is null.");
+    }
+    // Use a reference to the dereferenced object
+    const AbstractAlgorithm& algoRef = *algorithm;
+
+    // Get the mangled name
+    const char* mangled_name = typeid(algoRef).name();
+
+    // Demangle the name (this is compiler specific)
+    int status = 0;
+    char *demangled_name = abi::__cxa_demangle(mangled_name, nullptr, nullptr, &status);
+
+    std::string algorithmName = (status == 0) ? demangled_name : mangled_name;
+
+    // Free the memory allocated by __cxa_demangle
+    std::free(demangled_name);
+
+    return algorithmName;
 }

@@ -2,8 +2,8 @@
 #define SIMULATOR_H
 
 #include "utils.h"
-#include "Algorithm_a.h"
-#include "Algorithm_b.h"
+#include "../Algorithm_206448649/Algorithm_206448649.h"
+#include "../Algorithm_314939398/Algorithm_314939398.h"
 #include "WallSensor.h"
 #include "DirtSensor.h"
 #include "BatteryMeter.h"
@@ -53,6 +53,6 @@ private:
     void updateSimTotalStepsLog(Step step);
     void createOutputFile();
     std::string parseSimTotalStepsLog();
-};
+    std::string getAlgorithmName(const std::unique_ptr<AbstractAlgorithm>& algorithm);
 
 #endif // SIMULATOR_H

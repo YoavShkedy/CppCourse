@@ -7,7 +7,7 @@
 #include "AlgorithmRegistrar.h"
 
 struct AlgorithmRegistration {
-    AlgorithmRegistration(const std::string& name, AlgorithmFactory algorithmFactory) {
+    AlgorithmRegistration(const std::string &name, AlgorithmFactory algorithmFactory) {
         AlgorithmRegistrar::getAlgorithmRegistrar().registerAlgorithm(name, std::move(algorithmFactory));
     }
 };

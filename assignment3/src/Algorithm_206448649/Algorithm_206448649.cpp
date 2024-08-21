@@ -1,31 +1,31 @@
-#include "Algorithm_a.h"
+#include "Algorithm_206448649.h"
 
-Algorithm_a::Algorithm_a() : maxSteps(0), wallsSensor(nullptr), dirtSensor(nullptr), batteryMeter(nullptr),
-                         maxBatterySteps(0), totalSteps(0), dockingStation(0, 0), currPosition(0, 0),
-                         prevPosition(0,0) {
+Algorithm_206448649::Algorithm_206448649() : maxSteps(0), wallsSensor(nullptr), dirtSensor(nullptr), batteryMeter(nullptr),
+                                             maxBatterySteps(0), totalSteps(0), dockingStation(0, 0), currPosition(0, 0),
+                                             prevPosition(0, 0) {
     // Create a new Vertex for the docking station
     auto dockingStationVertex = std::make_shared<Vertex>(dockingStation, 0, Step::Stay);
     vertices[dockingStation] = dockingStationVertex;
     dirtyPos[dockingStation] = 0;
 }
 
-void Algorithm_a::setMaxSteps(std::size_t maxSteps) {
+void Algorithm_206448649::setMaxSteps(std::size_t maxSteps) {
     this->maxSteps = maxSteps;
 }
 
-void Algorithm_a::setWallsSensor(const WallsSensor &wallsSensor) {
+void Algorithm_206448649::setWallsSensor(const WallsSensor &wallsSensor) {
     this->wallsSensor = &wallsSensor;
 }
 
-void Algorithm_a::setDirtSensor(const DirtSensor &dirtSensor) {
+void Algorithm_206448649::setDirtSensor(const DirtSensor &dirtSensor) {
     this->dirtSensor = &dirtSensor;
 }
 
-void Algorithm_a::setBatteryMeter(const BatteryMeter &batteryMeter) {
+void Algorithm_206448649::setBatteryMeter(const BatteryMeter &batteryMeter) {
     this->batteryMeter = &batteryMeter;
 }
 
-Step Algorithm_a::nextStep() {
+Step Algorithm_206448649::nextStep() {
     Step res;
     if (firstStep) {
         firstStep = false;
@@ -113,11 +113,11 @@ Step Algorithm_a::nextStep() {
     return res;
 }
 
-void Algorithm_a::updateCurrPosition(Step step) {
+void Algorithm_206448649::updateCurrPosition(Step step) {
     currPosition = moveInDirection(currPosition, getMatchingDirection(step));
 }
 
-void Algorithm_a::relax() {
+void Algorithm_206448649::relax() {
     auto currVertex = vertices[currPosition];
     currVertex->vertexDirtLevel = dirtSensor->dirtLevel();
     currVertex->visited = true;
@@ -154,7 +154,7 @@ void Algorithm_a::relax() {
     }
 }
 
-Step Algorithm_a::chooseNeighbor() {
+Step Algorithm_206448649::chooseNeighbor() {
     Direction direction;
     int maxDirtLevel = -1;
     for (Direction dir: {Direction::North, Direction::East, Direction::South, Direction::West}) {
@@ -169,7 +169,7 @@ Step Algorithm_a::chooseNeighbor() {
     return getMatchingStep(direction);
 }
 
-Step Algorithm_a::moveTo(std::pair<int, int> targetPosition) {
+Step Algorithm_206448649::moveTo(std::pair<int, int> targetPosition) {
     if (currPosition.first < targetPosition.first) return Step::South;
     if (currPosition.first > targetPosition.first) return Step::North;
     if (currPosition.second < targetPosition.second) return Step::East;
@@ -177,7 +177,7 @@ Step Algorithm_a::moveTo(std::pair<int, int> targetPosition) {
     return Step::Stay;
 }
 
-std::pair<int, int> Algorithm_a::findClosestDirtyPoint(std::vector<Step> &path) {
+std::pair<int, int> Algorithm_206448649::findClosestDirtyPoint(std::vector<Step> &path) {
     std::queue<std::pair<int, int>> q;
     std::unordered_map<std::pair<int, int>, bool, VertexHash> visited;
     std::unordered_map<std::pair<int, int>, std::pair<int, int>, VertexHash> parent;
@@ -220,4 +220,7 @@ std::pair<int, int> Algorithm_a::findClosestDirtyPoint(std::vector<Step> &path) 
     return closestDirtyPoint;
 }
 
-REGISTER_ALGORITHM(Algorithm_a);
+extern "C" {
+REGISTER_ALGORITHM(Algorithm_206448649);
+}
+
