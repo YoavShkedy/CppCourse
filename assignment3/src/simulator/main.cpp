@@ -21,6 +21,7 @@ void writeError(const std::string &fileName, const std::string &errorMessage) {
         std::cerr << "Failed to open error file: " << fileName << std::endl;
     }
 }
+
 //TODO: add support to searching in local directory if no path is given
 void handleCommandLineArguments(int argc, char **argv) {
     for (int i = 1; i < argc; i++) {
@@ -50,6 +51,26 @@ void handleCommandLineArguments(int argc, char **argv) {
     }
 }
 
+void runWrapper(const std::pair <std::string, std::unique_ptr<AbstractAlgorithm>> &houseAlgoPair) {
+    const std::string &houseFilePath = houseAlgoPair.first;
+    std::unique_ptr <AbstractAlgorithm> algo = std::move(houseAlgoPair.second);
+
+    Simulator simulator;
+    simulator.readHouseFile(houseFilePath);
+    simulator.setAlgorithm(std::move(algo));
+    simulator.run();
+}
+
+void runWrapper(const std::pair <std::string, std::unique_ptr<AbstractAlgorithm>> &houseAlgoPair) {
+    const std::string &houseFilePath = houseAlgoPair.first;
+    std::unique_ptr <AbstractAlgorithm> algo = std::move(houseAlgoPair.second);
+
+    Simulator simulator;
+    simulator.readHouseFile(houseFilePath);
+    simulator.setAlgorithm(std::move(algo));
+    simulator.run();
+}
+
 int main(int argc, char **argv) {
     try {
         if (argc > 5) {
@@ -57,24 +78,28 @@ int main(int argc, char **argv) {
         }
         handleCommandLineArguments(argc, argv);
 
-        std::vector<std::string> houseFiles;
+        std::vector <std::string> houseFiles;
         std::vector<void *> algoHandles;
 
         // Iterate over houseDirPath to find .house files
         for (const auto &entry: std::filesystem::directory_iterator(houseDirPath)) {
             if (entry.is_regular_file() && entry.path().extension() == ".house") {
-                houseFiles.push_back(entry.path().string());
-                // Open the .house file
+                // Try to open the .house file
                 std::ifstream currHouseFile(entry.path());
                 if (!currHouseFile.is_open()) {
                     std::string errorFileName = entry.path().stem().string() + ".error";
                     writeError(errorFileName, "Failed to open house file: " + entry.path().string());
                     continue; // Skip this file
                 }
+
+                // If the file opened successfully, add it to the houseFiles vector
+                houseFiles.push_back(entry.path().string());
+
                 // Close the file
                 currHouseFile.close();
             }
         }
+
         // Iterate over algoDirPath to find .so files and open them with dlopen
         for (const auto &entry: std::filesystem::directory_iterator(algoDirPath)) {
             if (entry.is_regular_file() && entry.path().extension() == ".so") {
@@ -85,47 +110,58 @@ int main(int argc, char **argv) {
                                "Failed to open algorithm file: " + entry.path().string() + "\ndlerror: " + dlerror());
                     continue; // Skip this file
                 }
+
+                // Use dlsym to get the registerAlgorithm function from the shared library
+                auto registerAlgorithm = (void (*)()) dlsym(handle, "registerAlgorithm");
+                if (!registerAlgorithm) {
+                    std::string errorFileName = entry.path().stem().string() + ".error";
+                    writeError(errorFileName, "Failed to find registerAlgorithm function: " + std::string(dlerror()));
+                    dlclose(handle);
+                    continue; // Skip this file
+                }
+                // Call the function to register the algorithm
+                registerAlgorithm();
+
                 // Store the handle for later dlclose
                 algoHandles.push_back(handle);
             }
         }
         // Vector to store pairs of house files and algorithm handles
-        std::vector<std::pair<std::string, void*>> houseAlgoPairs;
+        std::vector < std::pair < std::string, std::unique_ptr < AbstractAlgorithm>>> houseAlgoPairs;
+        AlgorithmRegistrar &registrar = AlgorithmRegistrar::getAlgorithmRegistrar();
 
         // Create all possible pairs
-        for (const auto& house : houseFiles) {
-            for (const auto& algo : algoHandles) {
-                houseAlgoPairs.emplace_back(house, algo);
+        for (const auto &house: houseFiles) {
+            for (const auto &algoFactoryPair: registrar) {
+                houseAlgoPairs.emplace_back(house, algoFactoryPair.create());
             }
         }
 
+        std::queue < std::pair < std::string, std::unique_ptr < AbstractAlgorithm>>> tasks;
+        for (auto &pair: houseAlgoPairs) {
+            tasks.push(std::move(pair));
+        }
 
-        /*
-        Simulator simulator;
-        simulator.readHouseFile(houseFilePath);
-        auto algo_b = std::make_unique<Algorithm_206448649_314939398_A>();
-        simulator.setAlgorithm(std::move(algo_b));
+        std::mutex queueMutex;
+        std::vector <std::jthread> threads;
 
-        simulator.run();
-        simulator.runWithSim();
-        clear_libs(algo_libs);
-    } catch (const std::exception &e) {
-        std::cerr << "Exception: " << e.what() << std::endl;
-    } catch (...) {
-        std::cerr << "Unknown exception occurred" << std::endl;
-    }*/
+        for (int i = 0; i < numOfThreads; ++i) {
+            threads.emplace_back(worker, std::ref(tasks), std::ref(queueMutex));
+        }
 
         // Close all opened .so files
-        for (void *handle: algoHandles) {
+        for (void *handle : algoHandles) {
             if (handle) {
                 dlclose(handle);
             }
         }
 
     } catch (const std::exception &e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+        std::cerr << "Exception: " << e.what() << std::endl;
+        return 1;
+    } catch (...) {
+        std::cerr << "Unknown exception occurred" << std::endl;
         return 1;
     }
-
     return 0;
 }

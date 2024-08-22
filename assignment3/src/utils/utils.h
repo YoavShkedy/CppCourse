@@ -20,6 +20,10 @@
 #include <string>
 #include <cmath>
 #include <boost/functional/hash.hpp> // For boost::hash
+#include <thread>
+#include <memory>
+#include <mutex>
+#include <jthread>
 
 // Utility function declarations
 Direction getOppositeDirection(Direction dir);

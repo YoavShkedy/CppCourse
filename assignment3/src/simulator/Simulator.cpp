@@ -195,6 +195,7 @@ std::pair<int, int> Simulator::getSimDockingStationPosition() {
     return simDockingStationPosition;
 }
 
+
 void Simulator::run() {
     try { // while mission not completed
         while (true) {
