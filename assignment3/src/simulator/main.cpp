@@ -7,8 +7,8 @@
 #include <filesystem>
 #include <dlfcn.h>
 
-std::string houseDirPath;
-std::string algoDirPath;
+std::string houseDirPath = "";
+std::string algoDirPath = "";
 int numOfThreads = 10;
 bool summaryOnly = false;
 
@@ -22,7 +22,6 @@ void writeError(const std::string &fileName, const std::string &errorMessage) {
     }
 }
 
-//TODO: add support to searching in local directory if no path is given
 void handleCommandLineArguments(int argc, char **argv) {
     for (int i = 1; i < argc; i++) {
         std::istringstream ss(argv[i]);
@@ -49,6 +48,15 @@ void handleCommandLineArguments(int argc, char **argv) {
             throw std::runtime_error("Invalid argument format: " + std::string(argv[i]));
         }
     }
+    // if no houseDirPath is given, search in local working directory
+    if (houseDirPath.empty()) {
+        houseDirPath = std::filesystem::current_path().string();
+    }
+    // if no algoDirPath is given, search in local working directory
+    if (algoDirPath.empty()) {
+        algoDirPath = std::filesystem::current_path().string();
+    }
+
 }
 
 void runWrapper(const std::pair <std::string, std::unique_ptr<AbstractAlgorithm>> &houseAlgoPair) {
