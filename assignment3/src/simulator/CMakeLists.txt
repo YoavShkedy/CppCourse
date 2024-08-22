@@ -9,13 +9,20 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 # Set linker flags if necessary
 SET(CMAKE_EXE_LINKER_FLAGS "-rdynamic")
 
-# Include subdirectories for algorithms
-add_subdirectory(Algorithm_206448649_314939398_A)
-add_subdirectory(Algorithm_206448649_314939398_B)
+# Include subdirectories for algorithms, specifying both source and binary directories
+add_subdirectory(
+        ${CMAKE_SOURCE_DIR}/../Algorithm_206448649_314939398_A
+        ${CMAKE_BINARY_DIR}/Algorithm_206448649_314939398_A
+)
+add_subdirectory(
+        ${CMAKE_SOURCE_DIR}/../Algorithm_206448649_314939398_B
+        ${CMAKE_BINARY_DIR}/Algorithm_206448649_314939398_B
+)
 
 # Set paths for common directories
-set(SIM_DIR ${PROJECT_SOURCE_DIR}/simulator)
-set(COMMON_DIR ${PROJECT_SOURCE_DIR}/common)
+# Remove the simulator prefix since we are already inside the simulator directory
+set(SIM_DIR ${PROJECT_SOURCE_DIR})
+set(COMMON_DIR ${PROJECT_SOURCE_DIR}/../common)
 
 # Create the executable
 add_executable(${PROJECT_NAME}
