@@ -4,18 +4,27 @@ SET(CMAKE_SHARED_LINKER_FLAGS "-fPIC -shared -fvisibility=hidden -fvisibility-in
 
 project(Algorithm_206448649_314939398_A)
 
-set(INCLUDES ${PROJECT_SOURCE_DIR}/algorithm
-        ${PROJECT_SOURCE_DIR}/../common/)
+# Set the include directories
+set(INCLUDES    ${PROJECT_SOURCE_DIR}/../algorithm/
+        ${PROJECT_SOURCE_DIR}/../common/
+        ${PROJECT_SOURCE_DIR}/../Algorithm_206448649_314939398_A)
 
-set(SOURCES Algorithm_206448649_314939398_A.cpp)
+# Set the source files
+set(SOURCES     ${PROJECT_SOURCE_DIR}/Algorithm_206448649_314939398_A.cpp)
 
+# Create a shared library target
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
+# Specify the include directories for the target
 target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDES})
 
-set(ALGO_LIB_DIR ${CMAKE_BINARY_DIR}/algo_dir)
+# Set the output directory for the .so file
+set(ALGO_LIB_DIR ${CMAKE_BINARY_DIR}/../build)
 
+# Create the output directory if it doesn't exist
 file(MAKE_DIRECTORY ${ALGO_LIB_DIR})
 
+# Copy the .so file to the output directory after building
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> ${ALGO_LIB_DIR})
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> ${ALGO_LIB_DIR}
+        )

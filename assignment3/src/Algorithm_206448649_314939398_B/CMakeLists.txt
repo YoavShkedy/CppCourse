@@ -4,8 +4,17 @@ SET(CMAKE_SHARED_LINKER_FLAGS "-fPIC -shared -fvisibility=hidden -fvisibility-in
 
 project(Algorithm_206448649_314939398_B)
 
-set(INCLUDES ${PROJECT_SOURCE_DIR}/algorithm
-        ${PROJECT_SOURCE_DIR}/../common/)
+# Set paths for common directories
+set(COMMON_DIR ${PROJECT_SOURCE_DIR}/../common)
+set(UTILS_DIR ${PROJECT_SOURCE_DIR}/../utils)
+set(ALGO_DIR ${PROJECT_SOURCE_DIR}/../algorithm)
+
+# Include directories
+set(INCLUDES
+        ${COMMON_DIR}
+        ${UTILS_DIR}
+        ${ALGO_DIR}
+        )
 
 set(SOURCES Algorithm_206448649_314939398_B.cpp)
 
