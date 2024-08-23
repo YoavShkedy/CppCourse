@@ -58,9 +58,18 @@ void runWrapper(std::pair<std::string, std::unique_ptr<AbstractAlgorithm>> house
     std::unique_ptr<AbstractAlgorithm> algo = std::move(houseAlgoPair.second);
 
     Simulator simulator;
-    simulator.readHouseFile(houseFilePath);
-    simulator.setAlgorithm(std::move(algo));
-    simulator.run();
+    try {
+        simulator.readHouseFile(houseFilePath);
+        simulator.setAlgorithm(std::move(algo));
+        simulator.run();
+    } catch (const std::exception &e) {
+        std::cerr << "Error processing house file: " << houseFilePath << std::endl;
+        std::cerr << "Exception: " << e.what() << std::endl;
+
+        // Optionally, write to an error file
+        std::string errorFileName = std::filesystem::path(houseFilePath).stem().string() + ".error";
+        writeError(errorFileName, e.what());
+    }
 }
 
 
@@ -85,7 +94,7 @@ void worker(std::queue<std::pair<std::string, std::unique_ptr<AbstractAlgorithm>
 int main(int argc, char **argv) {
     try {
         if (argc > 5) {
-            throw std::runtime_error("up to 5 command-line arguments allowed");
+            throw std::runtime_error("At most 5 command-line arguments allowed.");
         }
         handleCommandLineArguments(argc, argv);
 

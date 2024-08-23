@@ -1,0 +1,9 @@
+/Users/dell/Yoav/CppCourse/assignment3/src/build/CMakeFiles/myrobot.dir
+/Users/dell/Yoav/CppCourse/assignment3/src/build/CMakeFiles/edit_cache.dir
+/Users/dell/Yoav/CppCourse/assignment3/src/build/CMakeFiles/rebuild_cache.dir
+/Users/dell/Yoav/CppCourse/assignment3/src/build/Algorithm_206448649_314939398_A/CMakeFiles/Algorithm_206448649_314939398_A.dir
+/Users/dell/Yoav/CppCourse/assignment3/src/build/Algorithm_206448649_314939398_A/CMakeFiles/edit_cache.dir
+/Users/dell/Yoav/CppCourse/assignment3/src/build/Algorithm_206448649_314939398_A/CMakeFiles/rebuild_cache.dir
+/Users/dell/Yoav/CppCourse/assignment3/src/build/Algorithm_206448649_314939398_B/CMakeFiles/Algorithm_206448649_314939398_B.dir
+/Users/dell/Yoav/CppCourse/assignment3/src/build/Algorithm_206448649_314939398_B/CMakeFiles/edit_cache.dir
+/Users/dell/Yoav/CppCourse/assignment3/src/build/Algorithm_206448649_314939398_B/CMakeFiles/rebuild_cache.dir
