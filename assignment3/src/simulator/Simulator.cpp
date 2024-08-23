@@ -399,7 +399,7 @@ std::string Simulator::parseSimTotalStepsLog() {
     return str;
 }
 
-std::string getAlgorithmName(const std::unique_ptr<AbstractAlgorithm> &algorithm) {
+std::string Simulator::getAlgorithmName(const std::unique_ptr<AbstractAlgorithm> &algorithm) {
     if (!algorithm) {
         throw std::runtime_error("Algorithm pointer is null.");
     }

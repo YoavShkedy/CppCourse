@@ -11,6 +11,12 @@ SET(CMAKE_EXE_LINKER_FLAGS "-rdynamic")
 # Find Boost
 find_package(Boost REQUIRED)
 
+include_directories(
+        ${Boost_INCLUDE_DIRS}
+        ${PROJECT_SOURCE_DIR}/Algorithm_206448649_314939398_A
+        ${PROJECT_SOURCE_DIR}/Algorithm_206448649_314939398_B
+)
+
 # Add subdirectories for the algorithms
 add_subdirectory(Algorithm_206448649_314939398_A)
 add_subdirectory(Algorithm_206448649_314939398_B)

@@ -8,9 +8,12 @@ set(INCLUDES ${PROJECT_SOURCE_DIR}/../algorithm/
         ${PROJECT_SOURCE_DIR}/../common/
         ${PROJECT_SOURCE_DIR}/../utils/)
 
-set(SOURCES Algorithm_206448649_314939398_B.cpp)
+set(SOURCES Algorithm_206448649_314939398_B.cpp
+        ${PROJECT_SOURCE_DIR}/../utils/utils.cpp
+        ${PROJECT_SOURCE_DIR}/../simulator/AlgorithmRegistrar.cpp)
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
+
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDES})
 

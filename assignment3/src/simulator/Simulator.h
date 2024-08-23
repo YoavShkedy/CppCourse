@@ -2,8 +2,8 @@
 #define SIMULATOR_H
 
 #include "utils.h"
-#include "../Algorithm_206448649/Algorithm_206448649_314939398_A.h"
-#include "../Algorithm_314939398/Algorithm_314939398.h"
+#include "../Algorithm_206448649_314939398_A/Algorithm_206448649_314939398_A.h"
+#include "../Algorithm_206448649_314939398_B/Algorithm_206448649_314939398_B.h"
 #include "WallSensor.h"
 #include "DirtSensor.h"
 #include "BatteryMeter.h"
