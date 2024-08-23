@@ -1,11 +1,6 @@
 #include "utils.h"
 #include "AlgorithmRegistration.h"
 #include "Simulator.h"
-#include "../Algorithm_206448649/Algorithm_206448649_314939398_A.h"
-#include "../Algorithm_314939398/Algorithm_314939398.h"
-
-#include <filesystem>
-#include <dlfcn.h>
 
 std::string houseDirPath = "";
 std::string algoDirPath = "";
@@ -56,12 +51,11 @@ void handleCommandLineArguments(int argc, char **argv) {
     if (algoDirPath.empty()) {
         algoDirPath = std::filesystem::current_path().string();
     }
-
 }
 
-void runWrapper(const std::pair <std::string, std::unique_ptr<AbstractAlgorithm>> &houseAlgoPair) {
+void runWrapper(std::pair<std::string, std::unique_ptr<AbstractAlgorithm>> houseAlgoPair) {
     const std::string &houseFilePath = houseAlgoPair.first;
-    std::unique_ptr <AbstractAlgorithm> algo = std::move(houseAlgoPair.second);
+    std::unique_ptr<AbstractAlgorithm> algo = std::move(houseAlgoPair.second);
 
     Simulator simulator;
     simulator.readHouseFile(houseFilePath);
@@ -69,14 +63,23 @@ void runWrapper(const std::pair <std::string, std::unique_ptr<AbstractAlgorithm>
     simulator.run();
 }
 
-void runWrapper(const std::pair <std::string, std::unique_ptr<AbstractAlgorithm>> &houseAlgoPair) {
-    const std::string &houseFilePath = houseAlgoPair.first;
-    std::unique_ptr <AbstractAlgorithm> algo = std::move(houseAlgoPair.second);
 
-    Simulator simulator;
-    simulator.readHouseFile(houseFilePath);
-    simulator.setAlgorithm(std::move(algo));
-    simulator.run();
+void worker(std::queue<std::pair<std::string, std::unique_ptr<AbstractAlgorithm>>> &tasks, std::mutex &queueMutex) {
+    while (true) {
+        std::pair<std::string, std::unique_ptr<AbstractAlgorithm>> task;
+
+        {
+            std::lock_guard<std::mutex> lock(queueMutex);
+            if (tasks.empty()) {
+                return; // No more tasks, exit thread
+            }
+            // Take the next task
+            task = std::move(tasks.front());
+            tasks.pop();
+        }
+
+        runWrapper(std::move(task));
+    }
 }
 
 int main(int argc, char **argv) {
@@ -86,11 +89,11 @@ int main(int argc, char **argv) {
         }
         handleCommandLineArguments(argc, argv);
 
-        std::vector <std::string> houseFiles;
+        std::vector<std::string> houseFiles;
         std::vector<void *> algoHandles;
 
         // Iterate over houseDirPath to find .house files
-        for (const auto &entry: std::filesystem::directory_iterator(houseDirPath)) {
+        for (const auto &entry : std::filesystem::directory_iterator(houseDirPath)) {
             if (entry.is_regular_file() && entry.path().extension() == ".house") {
                 // Try to open the .house file
                 std::ifstream currHouseFile(entry.path());
@@ -109,7 +112,7 @@ int main(int argc, char **argv) {
         }
 
         // Iterate over algoDirPath to find .so files and open them with dlopen
-        for (const auto &entry: std::filesystem::directory_iterator(algoDirPath)) {
+        for (const auto &entry : std::filesystem::directory_iterator(algoDirPath)) {
             if (entry.is_regular_file() && entry.path().extension() == ".so") {
                 void *handle = dlopen(entry.path().c_str(), RTLD_LAZY);
                 if (!handle) {
@@ -135,26 +138,33 @@ int main(int argc, char **argv) {
             }
         }
         // Vector to store pairs of house files and algorithm handles
-        std::vector < std::pair < std::string, std::unique_ptr < AbstractAlgorithm>>> houseAlgoPairs;
+        std::vector<std::pair<std::string, std::unique_ptr<AbstractAlgorithm>>> houseAlgoPairs;
         AlgorithmRegistrar &registrar = AlgorithmRegistrar::getAlgorithmRegistrar();
 
         // Create all possible pairs
-        for (const auto &house: houseFiles) {
-            for (const auto &algoFactoryPair: registrar) {
+        for (const auto &house : houseFiles) {
+            for (const auto &algoFactoryPair : registrar) {
                 houseAlgoPairs.emplace_back(house, algoFactoryPair.create());
             }
         }
 
-        std::queue < std::pair < std::string, std::unique_ptr < AbstractAlgorithm>>> tasks;
-        for (auto &pair: houseAlgoPairs) {
+        std::queue<std::pair<std::string, std::unique_ptr<AbstractAlgorithm>>> tasks;
+        for (auto &pair : houseAlgoPairs) {
             tasks.push(std::move(pair));
         }
 
         std::mutex queueMutex;
-        std::vector <std::jthread> threads;
+        std::vector<std::thread> threads;
 
         for (int i = 0; i < numOfThreads; ++i) {
             threads.emplace_back(worker, std::ref(tasks), std::ref(queueMutex));
+        }
+
+        // Join the threads
+        for (auto &t : threads) {
+            if (t.joinable()) {
+                t.join();
+            }
         }
 
         // Close all opened .so files

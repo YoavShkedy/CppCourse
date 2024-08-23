@@ -1,10 +1,10 @@
 #ifndef ALGO_REGISTRATION__
 #define ALGO_REGISTRATION__
 
-#include<utility>
-#include<string>
-
 #include "AlgorithmRegistrar.h"
+
+#include<utility>
+
 
 struct AlgorithmRegistration {
     AlgorithmRegistration(const std::string &name, AlgorithmFactory algorithmFactory) {
