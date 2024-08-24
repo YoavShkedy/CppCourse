@@ -8,6 +8,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 # Set linker flags if necessary
 SET(CMAKE_EXE_LINKER_FLAGS "-rdynamic")
 
+# Suppress the warning for FindBoost module
+if(POLICY CMP0167)
+    cmake_policy(SET CMP0167 OLD)
+endif()
+
 # Find Boost
 find_package(Boost REQUIRED)
 
