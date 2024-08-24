@@ -1,0 +1,8 @@
+Index: assignment3/cmake-build-debug/CMakeFiles/clion-log.txt
+===================================================================
+diff --git a/assignment3/cmake-build-debug/CMakeFiles/clion-log.txt b/assignment3/cmake-build-debug/CMakeFiles/clion-log.txt
+deleted file mode 100644
+--- a/assignment3/cmake-build-debug/CMakeFiles/clion-log.txt	(revision ff8989a52b01f100625872561a6e1924325e4cb8)
++++ /dev/null	(revision ff8989a52b01f100625872561a6e1924325e4cb8)
+@@ -1,1 +0,0 @@
+-CMakeLists.txt not found in /Users/dell/Yoav/CppCourse/assignment3 Select CMakeLists.txt
