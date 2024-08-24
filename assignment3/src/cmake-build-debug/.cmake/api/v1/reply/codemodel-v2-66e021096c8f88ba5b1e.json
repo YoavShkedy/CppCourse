@@ -1,0 +1,138 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2
+					],
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						2
+					]
+				},
+				{
+					"build" : "Algorithm_206448649_314939398_A",
+					"jsonFile" : "directory-Algorithm_206448649_314939398_A-Debug-f8d3cfe20e866aac121e.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "Algorithm_206448649_314939398_A",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"build" : "Algorithm_206448649_314939398_B",
+					"jsonFile" : "directory-Algorithm_206448649_314939398_B-Debug-d1c9cd814deaaad241a8.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 2,
+					"source" : "Algorithm_206448649_314939398_B",
+					"targetIndexes" : 
+					[
+						1
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1,
+						2
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "myrobot",
+					"targetIndexes" : 
+					[
+						2
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						1
+					],
+					"name" : "Algorithm_206448649_314939398_A",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						2
+					],
+					"name" : "Algorithm_206448649_314939398_B",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						1
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 1,
+					"id" : "Algorithm_206448649_314939398_A::@8059632ad1b7dfdf7dd1",
+					"jsonFile" : "target-Algorithm_206448649_314939398_A-Debug-f6700589cb9523133a80.json",
+					"name" : "Algorithm_206448649_314939398_A",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "Algorithm_206448649_314939398_B::@bcab96d56ab8e523b3c8",
+					"jsonFile" : "target-Algorithm_206448649_314939398_B-Debug-2933b4415f1be6c715f2.json",
+					"name" : "Algorithm_206448649_314939398_B",
+					"projectIndex" : 2
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "myrobot::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-myrobot-Debug-aed9e8b2400832790ee9.json",
+					"name" : "myrobot",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/Users/benshushan/Desktop/TAU/ThirdYear/C++/FinalProject/assignment3/src/cmake-build-debug",
+		"source" : "/Users/benshushan/Desktop/TAU/ThirdYear/C++/FinalProject/assignment3/src"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 4
+	}
+}
