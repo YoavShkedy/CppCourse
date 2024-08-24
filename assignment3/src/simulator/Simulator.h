@@ -30,6 +30,7 @@ public:
 
     void runWithSim();
 
+    void createTimeoutOutputFile();
 
 private:
     int rows, cols, maxSteps;
@@ -38,6 +39,7 @@ private:
     std::vector<std::vector<char>> houseLayout;
     bool dockingStationFound = false;
     std::pair<int, int> simDockingStationPosition;
+    int initDirt;
     int totalDirt;
     int simTotalSteps;
     float batteryLevel;
@@ -59,7 +61,11 @@ private:
 
     void setBatteryLevel(float num);
 
+    int getInitDirt() const { return initDirt; }
+
     int getTotalDirt() const;
+
+    int getMaxSteps() const { return maxSteps; }
 
     void printHouseLayout() const;
 

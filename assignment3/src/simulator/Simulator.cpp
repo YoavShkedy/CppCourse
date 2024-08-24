@@ -72,7 +72,7 @@ void Simulator::updateCurrentPosition(Step step) {
 
 void Simulator::readHouseFile(const std::string &filePath) {
     std::ifstream file(filePath);
-    if (!file.is_open()) throw std::runtime_error("Could not open file");
+    if (!file.is_open()) throw std::runtime_error("Could not open .house file:" + filePath);
 
     /* extract the input file name from the path, to be used in the output file name */
     std::filesystem::path inputPath(filePath);
@@ -85,7 +85,7 @@ void Simulator::readHouseFile(const std::string &filePath) {
     }*/
     for (int i = 0; i < 4; i++) {
         if (!getline(file, line)) {
-            throw std::runtime_error("File missing information");
+            throw std::runtime_error("File " + filePath + " missing information");
         }
         std::istringstream ss(line);
         std::string key;
@@ -102,7 +102,7 @@ void Simulator::readHouseFile(const std::string &filePath) {
     }
     // sanity check for: maxSteps, maxBatterySteps, rows, cols
     if (maxSteps < 0 || maxBatterySteps < 0 || rows < 0 || cols < 0) {
-        throw std::runtime_error("Invalid layout file");
+        throw std::runtime_error("Invalid .house file: " + filePath);
     }
     int houseLayoutRowsNum = 0;
     /* get house layout */
@@ -129,7 +129,7 @@ void Simulator::readHouseFile(const std::string &filePath) {
                 int index = std::distance(currRow.begin(), it);
                 simDockingStationPosition = std::make_pair(houseLayout.size() - 1, index);
             } else {
-                throw std::runtime_error("More than 1 docking station defined in layout");
+                throw std::runtime_error("More than 1 docking station defined in .house file: " + filePath);
             }
         }
         // update the total dirt count in the house
@@ -141,8 +141,9 @@ void Simulator::readHouseFile(const std::string &filePath) {
         }
     }
     if (!dockingStationFound) {
-        throw std::runtime_error("No docking station defined in layout");
+        throw std::runtime_error("No docking station defined in .house file: " + filePath);
     }
+    initDirt = totalDirt;
     simCurrPosition = simDockingStationPosition;
 }
 
@@ -342,19 +343,18 @@ void Simulator::runWithSim() {
 }
 
 void Simulator::createOutputFile() {
-    // create outputFileName
+    // Create outputFileName
     std::string algorithmName = getAlgorithmName(algo);
     std::string outputFileName = input_file_name + "-" + algorithmName;
     std::ofstream outputFile(outputFileName);
-    if (!outputFile) { // make sure the output file has been created
-        std::string err = "Error opening file: " + outputFileName;
-        throw std::runtime_error(err);
+    if (!outputFile) { // Make sure the output file has been created
+        throw std::runtime_error("Error opening file: " + outputFileName);
     }
     outputFile << "NumSteps = " << simTotalSteps << std::endl;
     outputFile << "DirtLeft = " << totalDirt << std::endl;
-    std::string status = "UNKOWN"; // default value
+    std::string status = "UNKNOWN"; // Default value
     std::string lastStep = simTotalStepsLog.back();
-    // determine the status
+    // Determine the status
     if (lastStep == "F") {
         if (simCurrPosition == simDockingStationPosition) {
             status = "FINISHED";
@@ -374,17 +374,39 @@ void Simulator::createOutputFile() {
 
     int score;
     if (status == "DEAD") {
-        score = maxSteps + totalDirt * 300 + 2000;
+        score = maxSteps + (totalDirt * 300) + 2000;
     }
     else if (status == "FINISHED" && inDock == "FALSE") {
-        score = maxSteps + totalDirt * 300 + 3000;
+        score = maxSteps + (totalDirt * 300) + 3000;
     }
     else if (inDock == "TRUE") {
-        score = simTotalSteps + totalDirt * 300;
+        score = simTotalSteps + (totalDirt * 300);
     }
     else {
-        score = simTotalSteps + totalDirt * 300 + 1000;
+        score = simTotalSteps + (totalDirt * 300) + 1000;
     }
+    outputFile << "Score = " << score << std::endl;
+
+    std::string steps_log = parseSimTotalStepsLog();
+    outputFile << "Steps: " << steps_log << std::endl;
+}
+
+void Simulator::createTimeoutOutputFile() {
+    // Create outputFileName
+    std::string algorithmName = getAlgorithmName(algo);
+    std::string outputFileName = input_file_name + "-" + algorithmName;
+    std::ofstream outputFile(outputFileName);
+    if (!outputFile) { // Make sure the output file has been created
+        throw std::runtime_error("Error opening file: " + outputFileName);
+    }
+    outputFile << "NumSteps = " << simTotalSteps << std::endl;
+    outputFile << "DirtLeft = " << totalDirt << std::endl;
+    outputFile << "Status = DEAD" << status << std::endl; // *** IS THIS THE RIGHT STATUS FOR TIMEOUT??? ***
+
+    std::string inDock = (simCurrPosition == simDockingStationPosition) ? "TRUE" : "FALSE";
+    outputFile << "InDock = " << inDock << std::endl;
+
+    int score = (maxSteps * 2) + (initDirt * 300) + 2000;
     outputFile << "Score = " << score << std::endl;
 
     std::string steps_log = parseSimTotalStepsLog();
