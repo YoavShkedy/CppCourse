@@ -1,0 +1,165 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "Algorithm_206448649_314939398_B/libAlgorithm_206448649_314939398_B.dylib"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"include_directories",
+			"target_include_directories"
+		],
+		"files" : 
+		[
+			"Algorithm_206448649_314939398_B/CMakeLists.txt",
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 15,
+				"parent" : 0
+			},
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 14,
+				"parent" : 2
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 18,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -fcolor-diagnostics"
+				},
+				{
+					"fragment" : "-std=c++20"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"define" : "Algorithm_206448649_314939398_B_EXPORTS"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 3,
+					"path" : "/opt/homebrew/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/benshushan/Desktop/TAU/ThirdYear/C++/FinalProject/assignment3/src/Algorithm_206448649_314939398_A"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/benshushan/Desktop/TAU/ThirdYear/C++/FinalProject/assignment3/src/Algorithm_206448649_314939398_B"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "/Users/benshushan/Desktop/TAU/ThirdYear/C++/FinalProject/assignment3/src/Algorithm_206448649_314939398_B/../algorithm"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "/Users/benshushan/Desktop/TAU/ThirdYear/C++/FinalProject/assignment3/src/Algorithm_206448649_314939398_B/../common"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "/Users/benshushan/Desktop/TAU/ThirdYear/C++/FinalProject/assignment3/src/Algorithm_206448649_314939398_B/../utils"
+				}
+			],
+			"language" : "CXX",
+			"languageStandard" : 
+			{
+				"backtraces" : 
+				[
+					1
+				],
+				"standard" : "20"
+			},
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2
+			]
+		}
+	],
+	"id" : "Algorithm_206448649_314939398_B::@bcab96d56ab8e523b3c8",
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "-fPIC -shared -fvisibility=hidden -fvisibility-inlines-hidden",
+				"role" : "flags"
+			}
+		],
+		"language" : "CXX"
+	},
+	"name" : "Algorithm_206448649_314939398_B",
+	"nameOnDisk" : "libAlgorithm_206448649_314939398_B.dylib",
+	"paths" : 
+	{
+		"build" : "Algorithm_206448649_314939398_B",
+		"source" : "Algorithm_206448649_314939398_B"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "Algorithm_206448649_314939398_B/Algorithm_206448649_314939398_B.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "utils/utils.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "simulator/AlgorithmRegistrar.cpp",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "SHARED_LIBRARY"
+}
