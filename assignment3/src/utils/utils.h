@@ -22,6 +22,9 @@
 #include <boost/functional/hash.hpp> // For boost::hash
 #include <mutex>
 #include <dlfcn.h>
+#include <map>
+#include <set>
+
 
 
 // Utility function declarations
@@ -36,6 +39,8 @@ Direction getMatchingDirection(Step step);
 std::string getMatchingString(Step step);
 
 std::pair<int, int> moveInDirection(std::pair<int, int> position, Direction dir);
+
+void writeError(const std::string &fileName, const std::string &errorMessage);
 
 class Vertex {
 public:

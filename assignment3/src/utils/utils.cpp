@@ -59,3 +59,16 @@ std::pair<int, int> moveInDirection(std::pair<int, int> position, Direction dir)
     }
     return position; // Default to no move to avoid compiler warning
 }
+
+void writeError(const std::string &fileName, const std::string &errorMessage) {
+    // open the file named 'fileName' (if it does not exist create it)
+    std::ofstream errorFile(fileName);
+    // check if the file cannot be opened
+    if (errorFile.is_open()) {
+        // write the error message in the file
+        errorFile << errorMessage << std::endl;
+        errorFile.close();
+    } else {
+        std::cerr << "Failed to open or create error file: " << fileName << std::endl;
+    }
+}

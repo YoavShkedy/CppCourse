@@ -26,6 +26,7 @@ class AlgorithmRegistrar {
 
     std::vector<AlgorithmFactoryPair> algorithms;
     static AlgorithmRegistrar registrar;
+
 public:
     // NOTE: API is guaranteed, actual implementation may change
     static AlgorithmRegistrar &getAlgorithmRegistrar();

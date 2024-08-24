@@ -4,18 +4,8 @@
 
 std::string houseDirPath = "";
 std::string algoDirPath = "";
-int numOfThreads = 10;
+int numOfThreads = 10; // default value
 bool summaryOnly = false;
-
-void writeError(const std::string &fileName, const std::string &errorMessage) {
-    std::ofstream errorFile(fileName);
-    if (errorFile.is_open()) {
-        errorFile << errorMessage << std::endl;
-        errorFile.close();
-    } else {
-        std::cerr << "Failed to open error file: " << fileName << std::endl;
-    }
-}
 
 void handleCommandLineArguments(int argc, char **argv) {
     for (int i = 1; i < argc; i++) {
@@ -53,18 +43,19 @@ void handleCommandLineArguments(int argc, char **argv) {
     }
 }
 
-void runWrapper(std::pair<std::string, std::unique_ptr<AbstractAlgorithm>> houseAlgoPair) {
+int runWrapper(std::pair<std::string, std::unique_ptr<AbstractAlgorithm>> houseAlgoPair) {
     const std::string &houseFilePath = houseAlgoPair.first;
     std::unique_ptr<AbstractAlgorithm> algo = std::move(houseAlgoPair.second);
 
-    Simulator simulator;
+    Simulator simulator(summaryOnly);
     simulator.readHouseFile(houseFilePath);
     simulator.setAlgorithm(std::move(algo));
-    simulator.run();
+    return simulator.run();
 }
 
-
-void worker(std::queue<std::pair<std::string, std::unique_ptr<AbstractAlgorithm>>> &tasks, std::mutex &queueMutex) {
+void worker(std::queue<std::pair<std::string, std::unique_ptr<AbstractAlgorithm>>> &tasks, std::mutex &queueMutex,
+            std::map<std::string, std::map<std::string, int>> &results,
+            std::mutex &resultsMutex) {
     while (true) {
         std::pair<std::string, std::unique_ptr<AbstractAlgorithm>> task;
 
@@ -78,7 +69,49 @@ void worker(std::queue<std::pair<std::string, std::unique_ptr<AbstractAlgorithm>
             tasks.pop();
         }
 
-        runWrapper(std::move(task));
+        int score = runWrapper(std::move(task));
+
+        {
+            std::lock_guard<std::mutex> lock(resultsMutex);
+            results[task.first][typeid(*task.second).name()] = score;
+        }
+    }
+}
+
+void writeCSV(const std::string &filename,
+              const std::set<std::string> &algorithms,
+              const std::vector<std::string> &houses,
+              const std::map<std::string, std::map<std::string, int>> &results) {
+    std::ofstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Failed to open CSV file: " << filename << std::endl;
+        return;
+    }
+
+    // Write the header
+    file << "Algorithm/House";
+    for (const auto &house : houses) {
+        file << "," << house;
+    }
+    file << "\n";
+
+    // Write the data
+    for (const auto &algorithm : algorithms) {
+        file << algorithm;
+        for (const auto &house : houses) {
+            auto algoIt = results.find(house);
+            if (algoIt != results.end()) {
+                auto houseIt = algoIt->second.find(algorithm);
+                if (houseIt != algoIt->second.end()) {
+                    file << "," << houseIt->second;
+                } else {
+                    file << ",";
+                }
+            } else {
+                file << ",";
+            }
+        }
+        file << "\n";
     }
 }
 
@@ -91,9 +124,11 @@ int main(int argc, char **argv) {
 
         std::vector<std::string> houseFiles;
         std::vector<void *> algoHandles;
+        std::set<std::string> algorithms;
+
 
         // Iterate over houseDirPath to find .house files
-        for (const auto &entry : std::filesystem::directory_iterator(houseDirPath)) {
+        for (const auto &entry: std::filesystem::directory_iterator(houseDirPath)) {
             if (entry.is_regular_file() && entry.path().extension() == ".house") {
                 // Try to open the .house file
                 std::ifstream currHouseFile(entry.path());
@@ -102,17 +137,23 @@ int main(int argc, char **argv) {
                     writeError(errorFileName, "Failed to open house file: " + entry.path().string());
                     continue; // Skip this file
                 }
-
-                // If the file opened successfully, add it to the houseFiles vector
+                // Test if the house file is valid using readHouseFile
+                Simulator sim;
+                bool validHouseFile = sim.readHouseFile(entry.path());
+                if (!validHouseFile) {
+                    std::string errorFileName = entry.path().stem().string() + ".error";
+                    writeError(errorFileName, "Invalid house file: " + entry.path().string());
+                    continue; // Skip this file
+                }
+                // If the file opened successfully and is valid, add it to the houseFiles vector
                 houseFiles.push_back(entry.path().string());
 
                 // Close the file
                 currHouseFile.close();
             }
         }
-
         // Iterate over algoDirPath to find .so files and open them with dlopen
-        for (const auto &entry : std::filesystem::directory_iterator(algoDirPath)) {
+        for (const auto &entry: std::filesystem::directory_iterator(algoDirPath)) {
             if (entry.is_regular_file() && entry.path().extension() == ".so") {
                 void *handle = dlopen(entry.path().c_str(), RTLD_LAZY);
                 if (!handle) {
@@ -142,33 +183,50 @@ int main(int argc, char **argv) {
         AlgorithmRegistrar &registrar = AlgorithmRegistrar::getAlgorithmRegistrar();
 
         // Create all possible pairs
-        for (const auto &house : houseFiles) {
-            for (const auto &algoFactoryPair : registrar) {
-                houseAlgoPairs.emplace_back(house, algoFactoryPair.create());
+        for (const auto &house: houseFiles) {
+            for (const auto &algoFactoryPair: registrar) {
+                // Create the algorithm instance
+                std::unique_ptr<AbstractAlgorithm> algorithm = algoFactoryPair.create();
+
+                // Check if the algorithm creation failed (returns nullptr)
+                if (algorithm) {
+                    // Only add the pair if the algorithm is valid (non-null)
+                    houseAlgoPairs.emplace_back(house, std::move(algorithm));
+                    algorithms.insert(algoFactoryPair.name()); // using a set to prevent duplications
+                } else {
+                    std::string errorFileName = algoFactoryPair.name() + ".error";
+                    writeError(errorFileName, "Algorithm Factory returned a nulptr for: " + algoFactoryPair.name());
+                    break; // do not create house<->Algo pairs with this algorithm
+                }
             }
         }
 
         std::queue<std::pair<std::string, std::unique_ptr<AbstractAlgorithm>>> tasks;
-        for (auto &pair : houseAlgoPairs) {
+        for (auto &pair: houseAlgoPairs) {
             tasks.push(std::move(pair));
         }
 
         std::mutex queueMutex;
+        std::mutex resultsMutex;
         std::vector<std::thread> threads;
+        std::map<std::string, std::map<std::string, int>> results;
 
         for (int i = 0; i < numOfThreads; ++i) {
-            threads.emplace_back(worker, std::ref(tasks), std::ref(queueMutex));
+            threads.emplace_back(worker, std::ref(tasks), std::ref(queueMutex), std::ref(results), std::ref(resultsMutex));
         }
 
         // Join the threads
-        for (auto &t : threads) {
+        for (auto &t: threads) {
             if (t.joinable()) {
                 t.join();
             }
         }
 
+        // Write results to CSV
+        writeCSV("summary.csv", algorithms, houseFiles, results);
+
         // Close all opened .so files
-        for (void *handle : algoHandles) {
+        for (void *handle: algoHandles) {
             if (handle) {
                 dlclose(handle);
             }

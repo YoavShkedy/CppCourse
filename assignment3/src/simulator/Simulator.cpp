@@ -3,7 +3,10 @@
 #include <cxxabi.h> // Required for demangling (GCC/Clang specific)
 
 
-Simulator::Simulator() : rows(-1), cols(-1), maxSteps(-1), maxBatterySteps(-1), totalDirt(0), simTotalSteps(0),
+Simulator::Simulator() : summaryOnly(false), rows(-1), cols(-1), maxSteps(-1), maxBatterySteps(-1), totalDirt(0), simTotalSteps(0),
+                         batteryLevel(-1) {}
+
+Simulator::Simulator(bool summaryOnly) : summaryOnly(summaryOnly), rows(-1), cols(-1), maxSteps(-1), maxBatterySteps(-1), totalDirt(0), simTotalSteps(0),
                          batteryLevel(-1) {}
 
 // WallSensor implementation
@@ -69,10 +72,14 @@ void Simulator::setBatteryLevel(float num) {
 void Simulator::updateCurrentPosition(Step step) {
     simCurrPosition = moveInDirection(simCurrPosition, getMatchingDirection(step));
 }
-
-void Simulator::readHouseFile(const std::string &filePath) {
+/* returns FALSE if house file cannot be open or is invalid, and TRUE if house file is valid */
+bool Simulator::readHouseFile(const std::string &filePath) {
     std::ifstream file(filePath);
-    if (!file.is_open()) throw std::runtime_error("Could not open file");
+    if (!file.is_open()) {
+        std::cout << "Simulator::readHouseFile ERROR: Failed to open file" << std::endl;
+        std::cout << "Invalid file name: " << input_file_name << std::endl;
+        return false;
+    }
 
     /* extract the input file name from the path, to be used in the output file name */
     std::filesystem::path inputPath(filePath);
@@ -80,12 +87,12 @@ void Simulator::readHouseFile(const std::string &filePath) {
 
     /* initialize houseLayoutName, MaxSteps, MaxBattery, Rows, Cols */
     std::string line;
-    /*if (getline(file, houseLayoutName)) {
-        //std::cout << "Layout Name: " << houseLayoutName << std::endl; // For debugging
-    }*/
     for (int i = 0; i < 4; i++) {
         if (!getline(file, line)) {
-            throw std::runtime_error("File missing information");
+            std::cout << "Simulator::readHouseFile ERROR: File missing information" << std::endl;
+            std::cout << "Invalid file name: " << input_file_name << std::endl;
+            file.close();
+            return false;
         }
         std::istringstream ss(line);
         std::string key;
@@ -102,7 +109,10 @@ void Simulator::readHouseFile(const std::string &filePath) {
     }
     // sanity check for: maxSteps, maxBatterySteps, rows, cols
     if (maxSteps < 0 || maxBatterySteps < 0 || rows < 0 || cols < 0) {
-        throw std::runtime_error("Invalid layout file");
+        std::cout << "Simulator::readHouseFile ERROR: Invalid house file parameter (maxSteps / MaxBatterySteps / house rows / house cols" << std::endl;
+        std::cout << "Invalid file name: " << input_file_name << std::endl;
+        file.close();
+        return false;
     }
     int houseLayoutRowsNum = 0;
     /* get house layout */
@@ -129,7 +139,10 @@ void Simulator::readHouseFile(const std::string &filePath) {
                 int index = std::distance(currRow.begin(), it);
                 simDockingStationPosition = std::make_pair(houseLayout.size() - 1, index);
             } else {
-                throw std::runtime_error("More than 1 docking station defined in layout");
+                std::cout << "Simulator::readHouseFile ERROR: More than 1 docking station defined in layout" << std::endl;
+                std::cout << "Invalid file name: " << input_file_name << std::endl;
+                file.close();
+                return false;
             }
         }
         // update the total dirt count in the house
@@ -141,9 +154,15 @@ void Simulator::readHouseFile(const std::string &filePath) {
         }
     }
     if (!dockingStationFound) {
-        throw std::runtime_error("No docking station defined in layout");
+        std::cout << "Simulator::readHouseFile ERROR: No docking station defined in layout" << std::endl;
+        std::cout << "Invalid file name: " << input_file_name << std::endl;
+        file.close();
+        return false;
     }
     simCurrPosition = simDockingStationPosition;
+    file.close();
+    // If house file is valid, return TRUE
+    return true;
 }
 
 void Simulator::printHouseLayout() const {
@@ -177,10 +196,11 @@ void Simulator::printHouseLayout() const {
 
 void Simulator::setAlgorithm(std::unique_ptr<AbstractAlgorithm> algorithm) {
     if (algorithm == nullptr) {
-        throw std::runtime_error(
-                "Exception in Simulator::setAlgorithm(): The given Algorithm pointer == nullptr");
+        std::string errorFileName = getAlgorithmName(algo) + ".error";
+        writeError(errorFileName, "Simulator::setAlgorithm ERROR: Algorithm pointer is nulptr: " + getAlgorithmName(algo));
     }
     this->algo = std::move(algorithm);
+    this->algoName = getAlgorithmName(algo);
     this->algo->setMaxSteps(maxSteps);
     this->algo->setWallsSensor(*this);
     this->algo->setDirtSensor(*this);
@@ -195,16 +215,20 @@ std::pair<int, int> Simulator::getSimDockingStationPosition() {
     return simDockingStationPosition;
 }
 
-
-void Simulator::run() {
+/* return -1 in case of an error, and score otherwise */
+int Simulator::run() {
     try { // while mission not completed
         while (true) {
             if (simTotalSteps > maxSteps) {
+                std::string errorFileName = algoName + ".error";
+                writeError(errorFileName, "Simulator::run() ERROR: Total steps taken by the simulation exceed MaxSteps");
                 throw std::runtime_error(
-                        "Exception in Simulator::run(): Executed more than the maximum allowed number of steps");
+                        "Simulator::run() ERROR: Total steps taken by the simulation exceed MaxSteps");
             } // if the battery is empty and not on docking station
             else if (batteryLevel == 0 && simCurrPosition != simDockingStationPosition) {
-                throw std::runtime_error("Exception in Simulator::run(): Run out of battery away from docking station");
+                std::string errorFileName = algoName + ".error";
+                writeError(errorFileName, "Simulator::run() ERROR: Run out of battery away from docking station");
+                throw std::runtime_error("Simulator::run() ERROR: Run out of battery away from docking station");
             }
             Step simNextStep = this->algo->nextStep();
 
@@ -235,9 +259,17 @@ void Simulator::run() {
             simTotalSteps++;
         }
     } catch (const std::exception &e) {
-        std::cerr << "Exception in Simulator::run(): " << e.what() << std::endl;
+        std::cerr << e.what() << std::endl;
+        return -1;
     }
-    createOutputFile();
+    int score = calcScore();
+    if (!summaryOnly) {
+        createOutputFile();
+        return score;
+    }
+    else {
+        return score;
+    }
 }
 
 void Simulator::updateSimTotalStepsLog(Step step) {
@@ -341,18 +373,8 @@ void Simulator::runWithSim() {
     return;
 }
 
-void Simulator::createOutputFile() {
-    // create outputFileName
-    std::string algorithmName = getAlgorithmName(algo);
-    std::string outputFileName = input_file_name + "-" + algorithmName;
-    std::ofstream outputFile(outputFileName);
-    if (!outputFile) { // make sure the output file has been created
-        std::string err = "Error opening file: " + outputFileName;
-        throw std::runtime_error(err);
-    }
-    outputFile << "NumSteps = " << simTotalSteps << std::endl;
-    outputFile << "DirtLeft = " << totalDirt << std::endl;
-    std::string status = "UNKOWN"; // default value
+std::string Simulator::calcStatus() {
+    std::string status = "UNKNOWN"; // default value
     std::string lastStep = simTotalStepsLog.back();
     // determine the status
     if (lastStep == "F") {
@@ -366,13 +388,19 @@ void Simulator::createOutputFile() {
     } else if (simTotalSteps == maxSteps && batteryLevel > 0) {
         status = "WORKING";
     }
+    return status;
+}
 
-    outputFile << "Status = " << status << std::endl;
-
+std::string Simulator::calcInDock() {
     std::string inDock = (simCurrPosition == simDockingStationPosition) ? "TRUE" : "FALSE";
-    outputFile << "InDock = " << inDock << std::endl;
+    return inDock;
+}
 
+int Simulator::calcScore() {
     int score;
+    std::string status = calcStatus();
+    std::string inDock = calcInDock();
+
     if (status == "DEAD") {
         score = maxSteps + totalDirt * 300 + 2000;
     }
@@ -385,10 +413,7 @@ void Simulator::createOutputFile() {
     else {
         score = simTotalSteps + totalDirt * 300 + 1000;
     }
-    outputFile << "Score = " << score << std::endl;
-
-    std::string steps_log = parseSimTotalStepsLog();
-    outputFile << "Steps: " << steps_log << std::endl;
+    return score;
 }
 
 std::string Simulator::parseSimTotalStepsLog() {
@@ -397,6 +422,27 @@ std::string Simulator::parseSimTotalStepsLog() {
         str += s;
     }
     return str;
+}
+
+void Simulator::createOutputFile() {
+    // create outputFileName
+    std::string outputFileName = input_file_name + "-" + algoName;
+    std::ofstream outputFile(outputFileName);
+    if (!outputFile) { // make sure the output file has been created
+        std::string err = "Simulator::createOutputFile() Error: Failed to create output file: " + outputFileName;
+        throw std::runtime_error(err);
+    }
+    std::string status = calcStatus();
+    outputFile << "Status = " << status << std::endl;
+
+    std::string inDock = calcInDock();
+    outputFile << "InDock = " << inDock << std::endl;
+
+    int score = calcScore();
+    outputFile << "Score = " << score << std::endl;
+
+    std::string steps_log = parseSimTotalStepsLog();
+    outputFile << "Steps: " << steps_log << std::endl;
 }
 
 std::string Simulator::getAlgorithmName(const std::unique_ptr<AbstractAlgorithm> &algorithm) {
