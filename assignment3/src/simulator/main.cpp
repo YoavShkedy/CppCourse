@@ -13,28 +13,32 @@ void print(std::string s) {
 
 void handleCommandLineArguments(int argc, char **argv) {
     for (int i = 1; i < argc; i++) {
-        std::istringstream ss(argv[i]);
-        std::string key;
-        std::string value;
+        std::string arg = argv[i];
 
-        // Extract key and value
-        if (std::getline(ss, key, '=') && std::getline(ss, value)) {
-            key.erase(key.find_last_not_of(" \t\n\r\f\v") + 1); // Trim trailing spaces
-            value.erase(0, value.find_first_not_of(" \t\n\r\f\v")); // Trim leading spaces
-
-            if (key == "-house_path") {
-                houseDirPath = value;
-            } else if (key == "-algo_path") {
-                algoDirPath = value;
-            } else if (key == "-num_threads") {
-                numOfThreads = std::stoi(value);
-            } else if (key == "-summary_only") {
-                summaryOnly = true;
-            } else {
-                throw std::runtime_error("Invalid argument key: " + key);
-            }
+        if (arg == "-summary_only") {
+            summaryOnly = true;
         } else {
-            throw std::runtime_error("Invalid argument format: " + std::string(argv[i]));
+            std::istringstream ss(arg);
+            std::string key;
+            std::string value;
+
+            // Extract key and value
+            if (std::getline(ss, key, '=') && std::getline(ss, value)) {
+                key.erase(key.find_last_not_of(" \t\n\r\f\v") + 1); // Trim trailing spaces
+                value.erase(0, value.find_first_not_of(" \t\n\r\f\v")); // Trim leading spaces
+
+                if (key == "-house_path") {
+                    houseDirPath = value;
+                } else if (key == "-algo_path") {
+                    algoDirPath = value;
+                } else if (key == "-num_threads") {
+                    numOfThreads = std::stoi(value);
+                } else {
+                    throw std::runtime_error("Invalid argument key: " + key);
+                }
+            } else {
+                throw std::runtime_error("Invalid argument format: " + arg);
+            }
         }
     }
     // if no houseDirPath is given, search in local working directory
@@ -46,6 +50,7 @@ void handleCommandLineArguments(int argc, char **argv) {
         algoDirPath = std::filesystem::current_path().string();
     }
 }
+
 
 void runSim(Simulator *simulator, std::atomic<bool>* finished, std::condition_variable* cv_timeout, std::mutex* m, int* score) {
     // Making the thread cancelable

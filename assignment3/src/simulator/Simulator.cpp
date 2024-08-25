@@ -1,6 +1,5 @@
 #include "Simulator.h"
 #include <typeinfo>
-#include <cxxabi.h> // Required for demangling (GCC/Clang specific)
 
 
 Simulator::Simulator() : summaryOnly(false), rows(-1), cols(-1), maxSteps(-1), maxBatterySteps(-1), totalDirt(0), simTotalSteps(0),
@@ -464,7 +463,7 @@ std::string Simulator::getAlgorithmName(const std::unique_ptr<AbstractAlgorithm>
     if (!algorithm) {
         throw std::runtime_error("Algorithm pointer is null.");
     }
-    // Use a reference to the dereferenced object
+    // Use a reference to the dereference object
     const AbstractAlgorithm& algoRef = *algorithm;
 
     // Get the mangled name
