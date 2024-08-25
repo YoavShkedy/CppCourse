@@ -279,6 +279,9 @@ int main(int argc, char **argv) {
         // Write results to CSV
         writeCSV("summary.csv", algorithms, houseFiles, results);
 
+        // Clear the AlgorithmRegistrar to remove all registered algorithms
+        AlgorithmRegistrar::getAlgorithmRegistrar().clear();
+
         // Close all opened .so files
         for (void *handle: algoHandles) {
             if (handle) {
