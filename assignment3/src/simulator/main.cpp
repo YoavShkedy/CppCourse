@@ -76,7 +76,7 @@ int runWrapper(std::pair<std::string, std::unique_ptr<AbstractAlgorithm>> houseA
     const std::string &houseFilePath = houseAlgoPair.first;
 
     // Get the algo name
-    const std::type_info& type_info = typeid(houseAlgoPair.second);
+    const std::type_info& type_info = typeid(*houseAlgoPair.second);
     int status;
     char *demangled = abi::__cxa_demangle(type_info.name(), nullptr, nullptr, &status);
     std::string algo_name = (status == 0) ? demangled : type_info.name();
