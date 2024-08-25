@@ -844,6 +844,8 @@ Algorithm_206448649_314939398_A/CMakeFiles/Algorithm_206448649_314939398_A.dir/A
   /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/map \
   /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/__tree \
   /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/set \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/cxxabi.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/__cxxabi_config.h \
   /Users/dell/Yoav/CppCourse/assignment3/src/Algorithm_206448649_314939398_A/../common/DirtSensor.h \
   /Users/dell/Yoav/CppCourse/assignment3/src/Algorithm_206448649_314939398_A/../common/WallSensor.h \
   /Users/dell/Yoav/CppCourse/assignment3/src/Algorithm_206448649_314939398_A/../common/BatteryMeter.h \

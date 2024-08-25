@@ -46,7 +46,6 @@ private:
     void updateCurrPosition(Step step);
     void relax();
     Step chooseNeighbor();
-    std::pair<int, int> findClosestDirtyPoint(std::vector<Step>& path);
 };
 
 

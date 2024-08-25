@@ -44,6 +44,7 @@ private:
     int rows, cols, maxSteps;
     float maxBatterySteps = -1;
     std::string houseLayoutName;
+    std::string houseFileName;
     std::vector<std::vector<char>> houseLayout;
     bool dockingStationFound = false;
     std::pair<int, int> simDockingStationPosition;

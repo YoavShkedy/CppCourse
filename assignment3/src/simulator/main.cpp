@@ -74,6 +74,14 @@ void runSim(Simulator *simulator, std::atomic<bool>* finished, std::condition_va
 
 int runWrapper(std::pair<std::string, std::unique_ptr<AbstractAlgorithm>> houseAlgoPair) {
     const std::string &houseFilePath = houseAlgoPair.first;
+
+    // Get the algo name
+    const std::type_info& type_info = typeid(houseAlgoPair.second);
+    int status;
+    char *demangled = abi::__cxa_demangle(type_info.name(), nullptr, nullptr, &status);
+    std::string algo_name = (status == 0) ? demangled : type_info.name();
+    free(demangled);
+
     std::unique_ptr<AbstractAlgorithm> algo = std::move(houseAlgoPair.second);
 
     Simulator simulator(summaryOnly);
@@ -105,8 +113,9 @@ int runWrapper(std::pair<std::string, std::unique_ptr<AbstractAlgorithm>> houseA
         // Calculate the timeout score
         int timeoutScore = (maxSteps * 2) + (initialDirt * 300) + 2000;
 
-        std::string errorFileName =  + ".error";
-        writeError(errorFileName, "Failed to open house file: " + entry.path().string());
+        // Create an error file which notifies about the timeout
+        std::string errorFileName = algo_name + ".error";
+        writeError(errorFileName, "Timout has occurred running " + algo_name + " on " + houseFilePath);
 
         // Create the timeout output file and return the timeout score
         simulator.createTimeoutOutputFile(timeoutScore);

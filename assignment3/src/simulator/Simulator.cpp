@@ -73,6 +73,7 @@ void Simulator::updateCurrentPosition(Step step) {
 }
 /* returns FALSE if house file cannot be open or is invalid, and TRUE if house file is valid */
 bool Simulator::readHouseFile(const std::string &filePath) {
+    houseFileName = filePath;
     std::ifstream file(filePath);
     if (!file.is_open()) {
         std::cout << "Simulator::readHouseFile ERROR: Failed to open file" << std::endl;
@@ -230,30 +231,35 @@ int Simulator::run() {
                 throw std::runtime_error("Simulator::run() ERROR: Run out of battery away from docking station");
             }
 
-            Step simNextStep = this->algo->nextStep();
-
-            if (simNextStep == Step::Finish) {
-                updateSimTotalStepsLog(simNextStep);
-                break;
-            }
-
-            if (simNextStep == Step::Stay) {
-                if (simCurrPosition == simDockingStationPosition) {
-                    updateBatteryLevel(maxBatterySteps / 20);
-                    if (batteryLevel > maxBatterySteps) {
-                        setBatteryLevel(maxBatterySteps);
+            try {
+                Step simNextStep = this->algo->nextStep();
+                if (simNextStep == Step::Finish) {
+                    updateSimTotalStepsLog(simNextStep);
+                    break;
+                }
+                if (simNextStep == Step::Stay) {
+                    if (simCurrPosition == simDockingStationPosition) {
+                        updateBatteryLevel(maxBatterySteps / 20);
+                        if (batteryLevel > maxBatterySteps) {
+                            setBatteryLevel(maxBatterySteps);
+                        }
+                    } else {
+                        updateBatteryLevel(-1);
+                        updateDirtLevel(-1);
+                        totalDirt--;
                     }
                 } else {
+                    updateCurrentPosition(simNextStep);
                     updateBatteryLevel(-1);
-                    updateDirtLevel(-1);
-                    totalDirt--;
                 }
-            } else {
-                updateCurrentPosition(simNextStep);
-                updateBatteryLevel(-1);
+                updateSimTotalStepsLog(simNextStep);
+                simTotalSteps++;
+
+            } catch (const std::exception &e) {
+                // Create an error file which notifies about the error
+                std::string errorFileName = this->algoName + ".error";
+                writeError(errorFileName, "Exception running " + this->algoName + " on " + houseFileName + ":" + e.what());
             }
-            updateSimTotalStepsLog(simNextStep);
-            simTotalSteps++;
         }
     } catch (const std::exception &e) {
         std::cerr << e.what() << std::endl;
@@ -457,7 +463,8 @@ void Simulator::createTimeoutOutputFile(int timeoutScore) {
 
     outputFile << "DirtLeft = " << totalDirt << std::endl;
 
-    outputFile << "Status = DEAD" << std::endl; // CHECK IF RIGHT STATUS FOR TIMEOUT
+    std::string status = calcStatus();
+    outputFile << "Status = " << status << std::endl;
 
     std::string inDock = calcInDock();
     outputFile << "InDock = " << inDock << std::endl;

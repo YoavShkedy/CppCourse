@@ -197,4 +197,3 @@ Step Algorithm_206448649_314939398_B::moveTo(std::pair<int, int> targetPosition)
     if (currPosition.second > targetPosition.second) return Step::West;
     return Step::Stay;
 }
-

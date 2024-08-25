@@ -225,7 +225,3 @@ std::pair<int, int> Algorithm_206448649_314939398_A::findClosestDirtyPoint(std::
     }
     return closestDirtyPoint;
 }
-
-
-
-
