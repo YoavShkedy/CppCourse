@@ -1,4 +1,6 @@
-Status = FINISHED
+NumSteps = 1
+DirtLeft = 36
+Status = DEAD
 InDock = TRUE
-Score = 6400
-Steps: EENEEEEESSNNWWWWWSWWssssssssssssssssssssSsEssEsssEssssNEWWWWssssssssssssssssssssWSSEEEEENsssssWWNWWsF
+Score = 12802
+Steps: sF

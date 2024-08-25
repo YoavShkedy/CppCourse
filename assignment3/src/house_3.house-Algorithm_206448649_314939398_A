@@ -1,3 +1,5 @@
+NumSteps = 280
+DirtLeft = 4
 Status = FINISHED
 InDock = TRUE
 Score = 1480

@@ -428,6 +428,10 @@ void Simulator::createOutputFile() {
         std::string err = "Simulator::createOutputFile() Error: Failed to create output file: " + outputFileName;
         throw std::runtime_error(err);
     }
+    outputFile << "NumSteps = " << simTotalSteps << std::endl;
+
+    outputFile << "DirtLeft = " << totalDirt << std::endl;
+
     std::string status = calcStatus();
     outputFile << "Status = " << status << std::endl;
 
@@ -449,6 +453,11 @@ void Simulator::createTimeoutOutputFile(int timeoutScore) {
         std::string err = "Simulator::createTimeoutOutputFile() Error: Failed to create output file: " + outputFileName;
         throw std::runtime_error(err);
     }
+
+    outputFile << "NumSteps = " << simTotalSteps << std::endl;
+
+    outputFile << "DirtLeft = " << totalDirt << std::endl;
+
     outputFile << "Status = DEAD" << std::endl; // CHECK IF RIGHT STATUS FOR TIMEOUT
 
     std::string inDock = calcInDock();
