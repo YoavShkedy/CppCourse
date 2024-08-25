@@ -1,7 +1,13 @@
 #include "Algorithm_206448649_314939398_A.h"
 
-Algorithm_206448649_314939398_A::Algorithm_206448649_314939398_A() : maxSteps(0), wallsSensor(nullptr), dirtSensor(nullptr), batteryMeter(nullptr),
-                                                                     maxBatterySteps(0), totalSteps(0), dockingStation(0, 0), currPosition(0, 0),
+extern "C" {
+REGISTER_ALGORITHM(Algorithm_206448649_314939398_A);
+}
+
+Algorithm_206448649_314939398_A::Algorithm_206448649_314939398_A() : maxSteps(0), wallsSensor(nullptr),
+                                                                     dirtSensor(nullptr), batteryMeter(nullptr),
+                                                                     maxBatterySteps(0), totalSteps(0),
+                                                                     dockingStation(0, 0), currPosition(0, 0),
                                                                      prevPosition(0, 0) {
     // Create a new Vertex for the docking station
     auto dockingStationVertex = std::make_shared<Vertex>(dockingStation, 0, Step::Stay);
@@ -220,7 +226,6 @@ std::pair<int, int> Algorithm_206448649_314939398_A::findClosestDirtyPoint(std::
     return closestDirtyPoint;
 }
 
-extern "C" {
-REGISTER_ALGORITHM(Algorithm_206448649_314939398_A);
-}
+
+
 

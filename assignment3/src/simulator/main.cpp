@@ -216,6 +216,8 @@ int main(int argc, char **argv) {
             }
         }
 
+        print("Number of algorithms registered: " + std::to_string(AlgorithmRegistrar::getAlgorithmRegistrar().count()));
+
         // Iterate over algoDirPath to find .so files and open them with dlopen
         for (const auto &entry: std::filesystem::directory_iterator(std::filesystem::path(algoDirPath))) {
             if (entry.is_regular_file() &&
@@ -226,23 +228,15 @@ int main(int argc, char **argv) {
                     writeError(errorFileName,
                                "Failed to open algorithm file: " + entry.path().string() + "\ndlerror: " + dlerror());
                     continue; // Skip this file
+                } else {
+                    print("Successfully loaded: " + entry.path().string());
                 }
-
-                // Use dlsym to get the registerAlgorithm function from the shared library
-                auto registerAlgorithm = (void (*)()) dlsym(handle, "registerAlgorithm");
-                if (!registerAlgorithm) {
-                    std::string errorFileName = entry.path().stem().string() + ".error";
-                    writeError(errorFileName, "Failed to find registerAlgorithm function: " + std::string(dlerror()));
-                    dlclose(handle);
-                    continue; // Skip this file
-                }
-                // Call the function to register the algorithm
-                registerAlgorithm();
-
                 // Store the handle for later dlclose
                 algoHandles.push_back(handle);
             }
         }
+        print("Number of algorithms registered: " + std::to_string(AlgorithmRegistrar::getAlgorithmRegistrar().count()));
+
         // Vector to store pairs of house files and algorithm handles
         std::vector<std::pair<std::string, std::unique_ptr<AbstractAlgorithm>>> houseAlgoPairs;
 
@@ -251,7 +245,7 @@ int main(int argc, char **argv) {
             for (const auto& algoFactoryPair : AlgorithmRegistrar::getAlgorithmRegistrar()) {
                 std::string s = "(" + house + ", " + algoFactoryPair.name() + ")";
                 print(s);
-                // Create the algorithm instance
+                // Create the algorithm registrar
                 auto algorithm = algoFactoryPair.create();
 
                 // Check if the algorithm creation failed (returns nullptr)

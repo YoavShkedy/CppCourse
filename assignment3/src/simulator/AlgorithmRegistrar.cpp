@@ -1,5 +1,4 @@
 #include "AlgorithmRegistrar.h"
 
-AlgorithmRegistrar AlgorithmRegistrar::registrar;
-
-AlgorithmRegistrar &AlgorithmRegistrar::getAlgorithmRegistrar() { return registrar; }
+// Initialize the static instance pointer
+AlgorithmRegistrar* AlgorithmRegistrar::instance = nullptr;

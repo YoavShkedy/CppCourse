@@ -1,12 +1,19 @@
 #include "Algorithm_206448649_314939398_B.h"
 
+extern "C" {
+REGISTER_ALGORITHM(Algorithm_206448649_314939398_B);
+}
+
+
 #include <algorithm>  // for std::shuffle
 #include <random>     // for std::default_random_engine
 #include <chrono>     // for std::chrono::system_clock
 
 
-Algorithm_206448649_314939398_B::Algorithm_206448649_314939398_B() : maxSteps(0), wallsSensor(nullptr), dirtSensor(nullptr), batteryMeter(nullptr),
-                                                                     maxBatterySteps(0), totalSteps(0), dockingStation(0, 0), currPosition(0, 0),
+Algorithm_206448649_314939398_B::Algorithm_206448649_314939398_B() : maxSteps(0), wallsSensor(nullptr),
+                                                                     dirtSensor(nullptr), batteryMeter(nullptr),
+                                                                     maxBatterySteps(0), totalSteps(0),
+                                                                     dockingStation(0, 0), currPosition(0, 0),
                                                                      prevPosition(0, 0) {
     // Create a new Vertex for the docking station
     auto dockingStationVertex = std::make_shared<Vertex>(dockingStation, 0, Step::Stay);
@@ -191,6 +198,3 @@ Step Algorithm_206448649_314939398_B::moveTo(std::pair<int, int> targetPosition)
     return Step::Stay;
 }
 
-extern "C" {
-REGISTER_ALGORITHM(Algorithm_206448649_314939398_B);
-}
