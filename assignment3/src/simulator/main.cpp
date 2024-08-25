@@ -127,20 +127,27 @@ void worker(std::queue<std::pair<std::string, std::unique_ptr<AbstractAlgorithm>
             tasks.pop();
         }
 
-        // Capture the necessary information before moving the task
-        std::string task_name = task.first;
+        // Extract the file name from the full path
+        std::filesystem::path housePath(task.first);
+        std::string houseFileName = housePath.filename().string();
+
+        // Capture the algorithm name before moving the task
         AbstractAlgorithm& algo_ref = *task.second;
         const std::type_info& type_info = typeid(algo_ref);
-        const char* type_name = type_info.name();
-        std::string algo_name = type_name;
+
+        int status;
+        char *demangled = abi::__cxa_demangle(type_info.name(), nullptr, nullptr, &status);
+        std::string algo_name = (status == 0) ? demangled : type_info.name();
+        free(demangled);  // Remember to free the demangled name
 
         int score = runWrapper(std::move(task));
         {
             std::lock_guard<std::mutex> lock(resultsMutex);
-            results[task.first][algo_name] = score;
+            results[houseFileName][algo_name] = score;
         }
     }
 }
+
 
 void writeCSV(const std::string &filename,
               const std::set<std::string> &algorithms,
@@ -155,7 +162,10 @@ void writeCSV(const std::string &filename,
     // Write the header
     file << "Algorithm/House";
     for (const auto &house : houses) {
-        file << "," << house;
+        // Extract the file name from the full path
+        std::filesystem::path housePath(house);
+        std::string houseFileName = housePath.filename().string();
+        file << "," << houseFileName;
     }
     file << "\n";
 
@@ -163,7 +173,11 @@ void writeCSV(const std::string &filename,
     for (const auto &algorithm : algorithms) {
         file << algorithm;
         for (const auto &house : houses) {
-            auto algoIt = results.find(house);
+            // Extract the file name from the full path
+            std::filesystem::path housePath(house);
+            std::string houseFileName = housePath.filename().string();
+
+            auto algoIt = results.find(houseFileName);
             if (algoIt != results.end()) {
                 auto houseIt = algoIt->second.find(algorithm);
                 if (houseIt != algoIt->second.end()) {
@@ -178,6 +192,8 @@ void writeCSV(const std::string &filename,
         file << "\n";
     }
 }
+
+
 
 int main(int argc, char **argv) {
     try {
