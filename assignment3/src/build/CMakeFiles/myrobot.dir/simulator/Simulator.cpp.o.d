@@ -844,6 +844,8 @@ CMakeFiles/myrobot.dir/simulator/Simulator.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/map \
   /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/__tree \
   /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/set \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/cxxabi.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/__cxxabi_config.h \
   /Users/dell/Yoav/CppCourse/assignment3/src/simulator/../Algorithm_206448649_314939398_A/Algorithm_206448649_314939398_A.h \
   /Users/dell/Yoav/CppCourse/assignment3/src/common/DirtSensor.h \
   /Users/dell/Yoav/CppCourse/assignment3/src/common/WallSensor.h \
@@ -852,6 +854,4 @@ CMakeFiles/myrobot.dir/simulator/Simulator.cpp.o: \
   /Users/dell/Yoav/CppCourse/assignment3/src/common/AlgorithmRegistrar.h \
   /Users/dell/Yoav/CppCourse/assignment3/src/algorithm/AlgorithmRegistration.h \
   /Users/dell/Yoav/CppCourse/assignment3/src/simulator/../Algorithm_206448649_314939398_B/Algorithm_206448649_314939398_B.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/condition_variable \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/cxxabi.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/__cxxabi_config.h
+  /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/condition_variable

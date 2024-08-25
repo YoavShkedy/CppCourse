@@ -843,6 +843,8 @@ CMakeFiles/myrobot.dir/simulator/main.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/map \
   /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/__tree \
   /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/set \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/cxxabi.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/__cxxabi_config.h \
   /Users/dell/Yoav/CppCourse/assignment3/src/algorithm/AlgorithmRegistration.h \
   /Users/dell/Yoav/CppCourse/assignment3/src/common/AlgorithmRegistrar.h \
   /Users/dell/Yoav/CppCourse/assignment3/src/common/AbstractAlgorithm.h \

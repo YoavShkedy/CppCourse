@@ -105,6 +105,9 @@ int runWrapper(std::pair<std::string, std::unique_ptr<AbstractAlgorithm>> houseA
         // Calculate the timeout score
         int timeoutScore = (maxSteps * 2) + (initialDirt * 300) + 2000;
 
+        std::string errorFileName =  + ".error";
+        writeError(errorFileName, "Failed to open house file: " + entry.path().string());
+
         // Create the timeout output file and return the timeout score
         simulator.createTimeoutOutputFile(timeoutScore);
         lock.unlock();
@@ -220,9 +223,17 @@ void checkHouseFiles(std::vector<std::string> &houseFiles) {
             // If the file opened successfully and is valid, add it to the houseFiles vector
             houseFiles.push_back(entry.path().string());
 
+            if (houseFiles.empty()) {
+                throw std::runtime_error("Cannot find .house files in " + std::filesystem::current_path().string());
+            }
             // Close the file
             currHouseFile.close();
         }
+
+        if (houseFiles.empty()) {
+            throw std::runtime_error("Cannot find .house files in " + std::filesystem::current_path().string());
+        }
+
     }
 }
 
@@ -241,6 +252,11 @@ void checkAlgorithmFiles(std::vector<void *> &algoHandles) {
             // Store the handle for later dlclose
             algoHandles.push_back(handle);
         }
+
+        if (algoHandles.empty()) {
+            throw std::runtime_error("Cannot find .so files in " + std::filesystem::current_path().string());
+        }
+
     }
 }
 
