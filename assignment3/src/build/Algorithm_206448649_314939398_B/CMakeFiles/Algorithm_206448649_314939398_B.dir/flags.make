@@ -4,9 +4,7 @@
 # compile CXX with /Library/Developer/CommandLineTools/usr/bin/c++
 CXX_DEFINES = -DAlgorithm_206448649_314939398_B_EXPORTS
 
-CXX_INCLUDES = -I/opt/homebrew/include -I/Users/benshushan/Desktop/TAU/ThirdYear/C++/FinalProject/assignment3/src/Algorithm_206448649_314939398_A -I/Users/benshushan/Desktop/TAU/ThirdYear/C++/FinalProject/assignment3/src/Algorithm_206448649_314939398_B -I/Users/benshushan/Desktop/TAU/ThirdYear/C++/FinalProject/assignment3/src/Algorithm_206448649_314939398_B/../algorithm -I/Users/benshushan/Desktop/TAU/ThirdYear/C++/FinalProject/assignment3/src/Algorithm_206448649_314939398_B/../common -I/Users/benshushan/Desktop/TAU/ThirdYear/C++/FinalProject/assignment3/src/Algorithm_206448649_314939398_B/../utils
+CXX_INCLUDES = -I/usr/local/include -I/Users/dell/Yoav/CppCourse/assignment3/src/Algorithm_206448649_314939398_A -I/Users/dell/Yoav/CppCourse/assignment3/src/Algorithm_206448649_314939398_B -I/Users/dell/Yoav/CppCourse/assignment3/src/Algorithm_206448649_314939398_B/../algorithm -I/Users/dell/Yoav/CppCourse/assignment3/src/Algorithm_206448649_314939398_B/../common -I/Users/dell/Yoav/CppCourse/assignment3/src/Algorithm_206448649_314939398_B/../utils
 
-CXX_FLAGSarm64 = -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC
-
-CXX_FLAGS = -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC
+CXX_FLAGS = -std=gnu++20 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk -fPIC
 

@@ -87,7 +87,7 @@ bool Simulator::readHouseFile(const std::string &filePath) {
 
     /* initialize houseLayoutName, MaxSteps, MaxBattery, Rows, Cols */
     std::string line;
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 5; i++) {
         if (!getline(file, line)) {
             std::cout << "Simulator::readHouseFile ERROR: File missing information" << std::endl;
             std::cout << "Invalid file name: " << input_file_name << std::endl;
@@ -98,8 +98,8 @@ bool Simulator::readHouseFile(const std::string &filePath) {
         std::string key;
         int value;
         getline(ss, key, '=');
+        key.erase(key.find_last_not_of(" \t\n\r\f\v") + 1); // Trim trailing spaces from key
         ss >> value;
-        key.erase(key.find_last_not_of(" \t\n\r\f\v") + 1);
         if (key == "MaxSteps") maxSteps = value;
         else if (key == "MaxBattery") {
             maxBatterySteps = float(value);
@@ -110,7 +110,7 @@ bool Simulator::readHouseFile(const std::string &filePath) {
     // sanity check for: maxSteps, maxBatterySteps, rows, cols
     if (maxSteps < 0 || maxBatterySteps < 0 || rows < 0 || cols < 0) {
         std::cout << "Simulator::readHouseFile ERROR: Invalid house file parameter (maxSteps / MaxBatterySteps / house rows / house cols" << std::endl;
-        std::cout << "Invalid file name: " << input_file_name << std::endl;
+        std::cout << "Invalid file: " << input_file_name << std::endl;
         file.close();
         return false;
     }
@@ -260,9 +260,6 @@ int Simulator::run() {
         std::cerr << e.what() << std::endl;
         return -1;
     }
-
-    finished.store(true);
-    cv_timeout.notify_one();
 
     int score = calcScore();
     if (!summaryOnly) {
@@ -444,12 +441,12 @@ void Simulator::createOutputFile() {
     outputFile << "Steps: " << steps_log << std::endl;
 }
 
-void createTimeoutOutputFile(int timeoutScore) {
+void Simulator::createTimeoutOutputFile(int timeoutScore) {
     // create outputFileName
     std::string outputFileName = input_file_name + "-" + algoName;
     std::ofstream outputFile(outputFileName);
     if (!outputFile) { // make sure the output file has been created
-        std::string err = "Simulator::createOutputFile() Error: Failed to create output file: " + outputFileName;
+        std::string err = "Simulator::createTimeoutOutputFile() Error: Failed to create output file: " + outputFileName;
         throw std::runtime_error(err);
     }
     outputFile << "Status = DEAD" << std::endl; // CHECK IF RIGHT STATUS FOR TIMEOUT

@@ -7,6 +7,10 @@ std::string algoDirPath = "";
 int numOfThreads = 10; // default value
 bool summaryOnly = false;
 
+void print(std::string s) {
+    std::cout << s << std::endl;
+}
+
 void handleCommandLineArguments(int argc, char **argv) {
     for (int i = 1; i < argc; i++) {
         std::istringstream ss(argv[i]);
@@ -83,7 +87,7 @@ int runWrapper(std::pair<std::string, std::unique_ptr<AbstractAlgorithm>> houseA
     std::unique_lock<std::mutex> lock(m);
 
     // Create the simulation thread
-    std::thread simThread(runSim(), &simulator, std::ref(finished), std::ref(cv_timeout), std::ref(m), std::ref(score));
+    std::thread simThread(runSim, &simulator, &finished, &cv_timeout, &m, &score);
 
     // Put the main thread into waiting state and release the mutex
     // Wait until cv notification or timeout has passed
@@ -127,7 +131,12 @@ void worker(std::queue<std::pair<std::string, std::unique_ptr<AbstractAlgorithm>
 
         {
             std::lock_guard<std::mutex> lock(resultsMutex);
-            results[task.first][typeid(*task.second).name()] = score;
+            AbstractAlgorithm& algo_ref = *task.second;
+            const std::type_info& type_info = typeid(algo_ref);
+            const char* type_name = type_info.name();
+            std::string algo_name = type_name;
+            results[task.first][algo_name] = score;
+//            results[task.first][typeid(*task.second).name()] = score;
         }
     }
 }
@@ -206,9 +215,11 @@ int main(int argc, char **argv) {
                 currHouseFile.close();
             }
         }
+
         // Iterate over algoDirPath to find .so files and open them with dlopen
-        for (const auto &entry: std::filesystem::directory_iterator(algoDirPath)) {
-            if (entry.is_regular_file() && entry.path().extension() == ".so") {
+        for (const auto &entry: std::filesystem::directory_iterator(std::filesystem::path(algoDirPath))) {
+            if (entry.is_regular_file() &&
+                (entry.path().extension() == ".so" || entry.path().extension() == ".dylib")) {
                 void *handle = dlopen(entry.path().c_str(), RTLD_LAZY);
                 if (!handle) {
                     std::string errorFileName = entry.path().stem().string() + ".error";
@@ -234,13 +245,14 @@ int main(int argc, char **argv) {
         }
         // Vector to store pairs of house files and algorithm handles
         std::vector<std::pair<std::string, std::unique_ptr<AbstractAlgorithm>>> houseAlgoPairs;
-        AlgorithmRegistrar &registrar = AlgorithmRegistrar::getAlgorithmRegistrar();
 
         // Create all possible pairs
         for (const auto &house: houseFiles) {
-            for (const auto &algoFactoryPair: registrar) {
+            for (const auto& algoFactoryPair : AlgorithmRegistrar::getAlgorithmRegistrar()) {
+                std::string s = "(" + house + ", " + algoFactoryPair.name() + ")";
+                print(s);
                 // Create the algorithm instance
-                std::unique_ptr<AbstractAlgorithm> algorithm = algoFactoryPair.create();
+                auto algorithm = algoFactoryPair.create();
 
                 // Check if the algorithm creation failed (returns nullptr)
                 if (algorithm) {

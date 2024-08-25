@@ -4,9 +4,7 @@
 # compile CXX with /Library/Developer/CommandLineTools/usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/opt/homebrew/include -I/Users/benshushan/Desktop/TAU/ThirdYear/C++/FinalProject/assignment3/src/Algorithm_206448649_314939398_A -I/Users/benshushan/Desktop/TAU/ThirdYear/C++/FinalProject/assignment3/src/Algorithm_206448649_314939398_B -I/Users/benshushan/Desktop/TAU/ThirdYear/C++/FinalProject/assignment3/src/simulator -I/Users/benshushan/Desktop/TAU/ThirdYear/C++/FinalProject/assignment3/src/common -I/Users/benshushan/Desktop/TAU/ThirdYear/C++/FinalProject/assignment3/src/utils -I/Users/benshushan/Desktop/TAU/ThirdYear/C++/FinalProject/assignment3/src/algorithm -I/Users/benshushan/Desktop/TAU/ThirdYear/C++/FinalProject/assignment3/src/Algorithm_206448649_314939398_A/../algorithm -I/Users/benshushan/Desktop/TAU/ThirdYear/C++/FinalProject/assignment3/src/Algorithm_206448649_314939398_A/../common -I/Users/benshushan/Desktop/TAU/ThirdYear/C++/FinalProject/assignment3/src/Algorithm_206448649_314939398_A/../utils -I/Users/benshushan/Desktop/TAU/ThirdYear/C++/FinalProject/assignment3/src/Algorithm_206448649_314939398_B/../algorithm -I/Users/benshushan/Desktop/TAU/ThirdYear/C++/FinalProject/assignment3/src/Algorithm_206448649_314939398_B/../common -I/Users/benshushan/Desktop/TAU/ThirdYear/C++/FinalProject/assignment3/src/Algorithm_206448649_314939398_B/../utils
+CXX_INCLUDES = -I/usr/local/include -I/Users/dell/Yoav/CppCourse/assignment3/src/Algorithm_206448649_314939398_A -I/Users/dell/Yoav/CppCourse/assignment3/src/Algorithm_206448649_314939398_B -I/Users/dell/Yoav/CppCourse/assignment3/src/simulator -I/Users/dell/Yoav/CppCourse/assignment3/src/common -I/Users/dell/Yoav/CppCourse/assignment3/src/utils -I/Users/dell/Yoav/CppCourse/assignment3/src/algorithm
 
-CXX_FLAGSarm64 = -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -std=c++20
-
-CXX_FLAGS = -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -std=c++20
+CXX_FLAGS = -std=gnu++20 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk -std=c++20
 
