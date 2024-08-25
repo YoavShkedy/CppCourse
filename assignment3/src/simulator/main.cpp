@@ -198,6 +198,72 @@ void writeCSV(const std::string &filename,
     }
 }
 
+void checkHouseFiles(std::vector<std::string> &houseFiles) {
+    // Iterate over houseDirPath to find .house files
+    for (const auto &entry: std::filesystem::directory_iterator(houseDirPath)) {
+        if (entry.is_regular_file() && entry.path().extension() == ".house") {
+            // Try to open the .house file
+            std::ifstream currHouseFile(entry.path());
+            if (!currHouseFile.is_open()) {
+                std::string errorFileName = entry.path().stem().string() + ".error";
+                writeError(errorFileName, "Failed to open house file: " + entry.path().string());
+                continue; // Skip this file
+            }
+            // Test if the house file is valid using readHouseFile
+            Simulator sim;
+            bool validHouseFile = sim.readHouseFile(entry.path());
+            if (!validHouseFile) {
+                std::string errorFileName = entry.path().stem().string() + ".error";
+                writeError(errorFileName, "Invalid house file: " + entry.path().string());
+                continue; // Skip this file
+            }
+            // If the file opened successfully and is valid, add it to the houseFiles vector
+            houseFiles.push_back(entry.path().string());
+
+            // Close the file
+            currHouseFile.close();
+        }
+    }
+}
+
+void checkAlgorithmFiles(std::vector<void *> &algoHandles) {
+    // Iterate over algoDirPath to find .so files and open them with dlopen
+    for (const auto &entry: std::filesystem::directory_iterator(std::filesystem::path(algoDirPath))) {
+        if (entry.is_regular_file() &&
+            (entry.path().extension() == ".so" || entry.path().extension() == ".dylib")) {
+            void *handle = dlopen(entry.path().c_str(), RTLD_LAZY);
+            if (!handle) {
+                std::string errorFileName = entry.path().stem().string() + ".error";
+                writeError(errorFileName,
+                           "Failed to open algorithm file: " + entry.path().string() + "\ndlerror: " + dlerror());
+                continue; // Skip this file
+            }
+            // Store the handle for later dlclose
+            algoHandles.push_back(handle);
+        }
+    }
+}
+
+void createHouseAlgoPairs(std::vector<std::string> &houseFiles, std::set<std::string> &algorithms, std::vector<std::pair<std::string, std::unique_ptr<AbstractAlgorithm>>> &houseAlgoPairs) {
+    // Create all possible pairs
+    for (const auto &house: houseFiles) {
+        for (const auto& algoFactoryPair : AlgorithmRegistrar::getAlgorithmRegistrar()) {
+            // Create the algorithm registrar
+            auto algorithm = algoFactoryPair.create();
+
+            // Check if the algorithm creation failed (returns nullptr)
+            if (algorithm) {
+                // Only add the pair if the algorithm is valid (non-null)
+                houseAlgoPairs.emplace_back(house, std::move(algorithm));
+                algorithms.insert(algoFactoryPair.name()); // using a set to prevent duplications
+            } else {
+                std::string errorFileName = algoFactoryPair.name() + ".error";
+                writeError(errorFileName, "Algorithm Factory returned a nulptr for: " + algoFactoryPair.name());
+                break; // do not create house<->Algo pairs with this algorithm
+            }
+        }
+    }
+}
 
 
 int main(int argc, char **argv) {
@@ -208,75 +274,17 @@ int main(int argc, char **argv) {
         handleCommandLineArguments(argc, argv);
 
         std::vector<std::string> houseFiles;
-        std::vector<void *> algoHandles;
-        std::set<std::string> algorithms;
-
-
-        // Iterate over houseDirPath to find .house files
-        for (const auto &entry: std::filesystem::directory_iterator(houseDirPath)) {
-            if (entry.is_regular_file() && entry.path().extension() == ".house") {
-                // Try to open the .house file
-                std::ifstream currHouseFile(entry.path());
-                if (!currHouseFile.is_open()) {
-                    std::string errorFileName = entry.path().stem().string() + ".error";
-                    writeError(errorFileName, "Failed to open house file: " + entry.path().string());
-                    continue; // Skip this file
-                }
-                // Test if the house file is valid using readHouseFile
-                Simulator sim;
-                bool validHouseFile = sim.readHouseFile(entry.path());
-                if (!validHouseFile) {
-                    std::string errorFileName = entry.path().stem().string() + ".error";
-                    writeError(errorFileName, "Invalid house file: " + entry.path().string());
-                    continue; // Skip this file
-                }
-                // If the file opened successfully and is valid, add it to the houseFiles vector
-                houseFiles.push_back(entry.path().string());
-
-                // Close the file
-                currHouseFile.close();
-            }
-        }
+        checkHouseFiles(houseFiles);
 
         AlgorithmRegistrar::getAlgorithmRegistrar().clear();
 
-        // Iterate over algoDirPath to find .so files and open them with dlopen
-        for (const auto &entry: std::filesystem::directory_iterator(std::filesystem::path(algoDirPath))) {
-            if (entry.is_regular_file() &&
-                (entry.path().extension() == ".so" || entry.path().extension() == ".dylib")) {
-                void *handle = dlopen(entry.path().c_str(), RTLD_LAZY);
-                if (!handle) {
-                    std::string errorFileName = entry.path().stem().string() + ".error";
-                    writeError(errorFileName,
-                               "Failed to open algorithm file: " + entry.path().string() + "\ndlerror: " + dlerror());
-                    continue; // Skip this file
-                }
-                // Store the handle for later dlclose
-                algoHandles.push_back(handle);
-            }
-        }
+        std::vector<void *> algoHandles;
+        std::set<std::string> algorithms;
+        checkAlgorithmFiles(algoHandles);
 
         // Vector to store pairs of house files and algorithm handles
         std::vector<std::pair<std::string, std::unique_ptr<AbstractAlgorithm>>> houseAlgoPairs;
-
-        // Create all possible pairs
-        for (const auto &house: houseFiles) {
-            for (const auto& algoFactoryPair : AlgorithmRegistrar::getAlgorithmRegistrar()) {
-                // Create the algorithm registrar
-                auto algorithm = algoFactoryPair.create();
-
-                // Check if the algorithm creation failed (returns nullptr)
-                if (algorithm) {
-                    // Only add the pair if the algorithm is valid (non-null)
-                    houseAlgoPairs.emplace_back(house, std::move(algorithm));
-                    algorithms.insert(algoFactoryPair.name()); // using a set to prevent duplications
-                } else {
-                    std::string errorFileName = algoFactoryPair.name() + ".error";
-                    writeError(errorFileName, "Algorithm Factory returned a nulptr for: " + algoFactoryPair.name());
-                    break; // do not create house<->Algo pairs with this algorithm
-                }
-            }
-        }
+        createHouseAlgoPairs(houseFiles, algorithms, houseAlgoPairs);
 
         std::queue<std::pair<std::string, std::unique_ptr<AbstractAlgorithm>>> tasks;
         for (auto &pair: houseAlgoPairs) {
