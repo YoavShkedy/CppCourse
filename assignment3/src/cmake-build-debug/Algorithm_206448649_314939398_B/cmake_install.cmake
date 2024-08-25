@@ -1,4 +1,4 @@
-# Install script for directory: /Users/benshushan/Desktop/TAU/ThirdYear/C++/FinalProject/assignment3/src/Algorithm_206448649_314939398_B
+# Install script for directory: /Users/dell/Yoav/CppCourse/assignment3/src/Algorithm_206448649_314939398_B
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

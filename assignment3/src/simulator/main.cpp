@@ -127,16 +127,17 @@ void worker(std::queue<std::pair<std::string, std::unique_ptr<AbstractAlgorithm>
             tasks.pop();
         }
 
-        int score = runWrapper(std::move(task));
+        // Capture the necessary information before moving the task
+        std::string task_name = task.first;
+        AbstractAlgorithm& algo_ref = *task.second;
+        const std::type_info& type_info = typeid(algo_ref);
+        const char* type_name = type_info.name();
+        std::string algo_name = type_name;
 
+        int score = runWrapper(std::move(task));
         {
             std::lock_guard<std::mutex> lock(resultsMutex);
-            AbstractAlgorithm& algo_ref = *task.second;
-            const std::type_info& type_info = typeid(algo_ref);
-            const char* type_name = type_info.name();
-            std::string algo_name = type_name;
             results[task.first][algo_name] = score;
-//            results[task.first][typeid(*task.second).name()] = score;
         }
     }
 }
@@ -216,7 +217,7 @@ int main(int argc, char **argv) {
             }
         }
 
-        print("Number of algorithms registered: " + std::to_string(AlgorithmRegistrar::getAlgorithmRegistrar().count()));
+        AlgorithmRegistrar::getAlgorithmRegistrar().clear();
 
         // Iterate over algoDirPath to find .so files and open them with dlopen
         for (const auto &entry: std::filesystem::directory_iterator(std::filesystem::path(algoDirPath))) {
@@ -228,14 +229,11 @@ int main(int argc, char **argv) {
                     writeError(errorFileName,
                                "Failed to open algorithm file: " + entry.path().string() + "\ndlerror: " + dlerror());
                     continue; // Skip this file
-                } else {
-                    print("Successfully loaded: " + entry.path().string());
                 }
                 // Store the handle for later dlclose
                 algoHandles.push_back(handle);
             }
         }
-        print("Number of algorithms registered: " + std::to_string(AlgorithmRegistrar::getAlgorithmRegistrar().count()));
 
         // Vector to store pairs of house files and algorithm handles
         std::vector<std::pair<std::string, std::unique_ptr<AbstractAlgorithm>>> houseAlgoPairs;
@@ -243,8 +241,6 @@ int main(int argc, char **argv) {
         // Create all possible pairs
         for (const auto &house: houseFiles) {
             for (const auto& algoFactoryPair : AlgorithmRegistrar::getAlgorithmRegistrar()) {
-                std::string s = "(" + house + ", " + algoFactoryPair.name() + ")";
-                print(s);
                 // Create the algorithm registrar
                 auto algorithm = algoFactoryPair.create();
 

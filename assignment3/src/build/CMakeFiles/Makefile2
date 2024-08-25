@@ -113,8 +113,8 @@ Algorithm_206448649_314939398_B/clean: Algorithm_206448649_314939398_B/CMakeFile
 # Target rules for target CMakeFiles/myrobot.dir
 
 # All Build rule for target.
-CMakeFiles/myrobot.dir/all: Algorithm_206448649_314939398_B/CMakeFiles/Algorithm_206448649_314939398_B.dir/all
 CMakeFiles/myrobot.dir/all: Algorithm_206448649_314939398_A/CMakeFiles/Algorithm_206448649_314939398_A.dir/all
+CMakeFiles/myrobot.dir/all: Algorithm_206448649_314939398_B/CMakeFiles/Algorithm_206448649_314939398_B.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/myrobot.dir/build.make CMakeFiles/myrobot.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/myrobot.dir/build.make CMakeFiles/myrobot.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/dell/Yoav/CppCourse/assignment3/src/build/CMakeFiles --progress-num=9,10,11,12,13 "Built target myrobot"

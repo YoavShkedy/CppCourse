@@ -42,7 +42,6 @@ public:
     }
 
     void registerAlgorithm(const std::string &name, AlgorithmFactory algorithmFactory) {
-        std::cout << "Registering algorithm in registrar at address: " << this << std::endl;
         algorithms.emplace_back(name, std::move(algorithmFactory));
     }
 
@@ -51,7 +50,6 @@ public:
     auto end() const { return algorithms.end(); }
 
     std::size_t count() const {
-        std::cout << "Counting algorithms in registrar at address: " << this << std::endl;
         return algorithms.size();
     }
 
