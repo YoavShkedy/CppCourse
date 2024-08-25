@@ -7,6 +7,8 @@
 #include "WallSensor.h"
 #include "DirtSensor.h"
 #include "BatteryMeter.h"
+#include <condition_variable>
+#include <atomic>
 
 
 class Simulator : public WallsSensor, public DirtSensor, public BatteryMeter {
@@ -32,6 +34,11 @@ public:
 
     void runWithSim();
 
+    int getMaxSteps() const { return maxSteps; }
+
+    int getInitialDirt() const { return initDirt; }
+
+    void createTimeoutOutputFile(int timeoutScore);
 
 private:
     int rows, cols, maxSteps;
@@ -41,6 +48,7 @@ private:
     bool dockingStationFound = false;
     std::pair<int, int> simDockingStationPosition;
     int totalDirt;
+    int initDirt;
     int simTotalSteps;
     float batteryLevel;
     std::pair<int, int> simCurrPosition;

@@ -43,6 +43,26 @@ void handleCommandLineArguments(int argc, char **argv) {
     }
 }
 
+void runSim(Simulator *simulator, std::atomic<bool>* finished, std::condition_variable* cv_timeout, std::mutex* m, int* score) {
+    // Making the thread cancelable
+    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, nullptr);
+    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, nullptr);
+
+    std::unique_lock<std::mutex> lock(*m); // Prevent the simulation thread from running before the main thread starts waiting
+    lock.unlock(); // Simulation thread should not hold the lock when executing the simulation
+
+    // Run the simulation and save the score
+    *score = simulator->run();
+
+    // Indicate that simulation has finished running
+    lock.lock();
+    *finished = true;
+    lock.unlock();
+
+    // Notify the main thread that the simulation is done
+    cv_timeout->notify_one();
+}
+
 int runWrapper(std::pair<std::string, std::unique_ptr<AbstractAlgorithm>> houseAlgoPair) {
     const std::string &houseFilePath = houseAlgoPair.first;
     std::unique_ptr<AbstractAlgorithm> algo = std::move(houseAlgoPair.second);
@@ -50,7 +70,41 @@ int runWrapper(std::pair<std::string, std::unique_ptr<AbstractAlgorithm>> houseA
     Simulator simulator(summaryOnly);
     simulator.readHouseFile(houseFilePath);
     simulator.setAlgorithm(std::move(algo));
-    return simulator.run();
+
+    int maxSteps = simulator.getMaxSteps();
+    int initialDirt = simulator.getInitialDirt();
+    int score = -1;  // Initialize score to an error value or default
+
+    std::atomic<bool> finished = false;
+    std::condition_variable cv_timeout;
+    std::mutex m;
+
+    // Prevent the simulation thread from running before the main thread starts waiting
+    std::unique_lock<std::mutex> lock(m);
+
+    // Create the simulation thread
+    std::thread simThread(runSim(), &simulator, std::ref(finished), std::ref(cv_timeout), std::ref(m), std::ref(score));
+
+    // Put the main thread into waiting state and release the mutex
+    // Wait until cv notification or timeout has passed
+    if (!cv_timeout.wait_for(lock, std::chrono::milliseconds(maxSteps), [&finished]() { return finished.load(); })) {
+        // Thread running the simulation has reached its timeout
+        // Main thread reacquires the mutex
+        pthread_cancel(simThread.native_handle()); // Cancel the simulation thread
+        simThread.detach(); // Detach simulation thread, cleaning up without blocking the main thread
+
+        // Calculate the timeout score
+        int timeoutScore = (maxSteps * 2) + (initialDirt * 300) + 2000;
+
+        // Create the timeout output file and return the timeout score
+        simulator.createTimeoutOutputFile(timeoutScore);
+        lock.unlock();
+        return timeoutScore;
+    } else {
+        // (Received cv notification) or (timeout has not passed and finished == true)
+        simThread.join();
+        return score;  // Return the score obtained from the simulation
+    }
 }
 
 void worker(std::queue<std::pair<std::string, std::unique_ptr<AbstractAlgorithm>>> &tasks, std::mutex &queueMutex,

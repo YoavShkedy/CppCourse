@@ -81,7 +81,7 @@ bool Simulator::readHouseFile(const std::string &filePath) {
         return false;
     }
 
-    /* extract the input file name from the path, to be used in the output file name */
+    /* extract the house_files file name from the path, to be used in the output file name */
     std::filesystem::path inputPath(filePath);
     input_file_name = inputPath.filename().string();
 
@@ -124,7 +124,7 @@ bool Simulator::readHouseFile(const std::string &filePath) {
         if (int(currRow.size()) < cols) {
             currRow.resize(cols, ' ');
         }
-            // if the number of cols in the given layout is greater than 'Cols' -> shorten the row by deleting the last elements
+        // if the number of cols in the given layout is greater than 'Cols' -> shorten the row by deleting the last elements
         else if (int(currRow.size()) > cols) {
             currRow.resize(cols);
         }
@@ -159,6 +159,7 @@ bool Simulator::readHouseFile(const std::string &filePath) {
         file.close();
         return false;
     }
+    initDirt = totalDirt;
     simCurrPosition = simDockingStationPosition;
     file.close();
     // If house file is valid, return TRUE
@@ -217,41 +218,38 @@ std::pair<int, int> Simulator::getSimDockingStationPosition() {
 
 /* return -1 in case of an error, and score otherwise */
 int Simulator::run() {
-    try { // while mission not completed
+    try {
         while (true) {
             if (simTotalSteps > maxSteps) {
                 std::string errorFileName = algoName + ".error";
                 writeError(errorFileName, "Simulator::run() ERROR: Total steps taken by the simulation exceed MaxSteps");
                 throw std::runtime_error(
                         "Simulator::run() ERROR: Total steps taken by the simulation exceed MaxSteps");
-            } // if the battery is empty and not on docking station
-            else if (batteryLevel == 0 && simCurrPosition != simDockingStationPosition) {
+            } else if (batteryLevel == 0 && simCurrPosition != simDockingStationPosition) {
                 std::string errorFileName = algoName + ".error";
                 writeError(errorFileName, "Simulator::run() ERROR: Run out of battery away from docking station");
                 throw std::runtime_error("Simulator::run() ERROR: Run out of battery away from docking station");
             }
+
             Step simNextStep = this->algo->nextStep();
 
-            // if the algorithm returns 'Finish' -> break the loop
             if (simNextStep == Step::Finish) {
                 updateSimTotalStepsLog(simNextStep);
                 break;
             }
+
             if (simNextStep == Step::Stay) {
-                // if on docking station -> charge
                 if (simCurrPosition == simDockingStationPosition) {
                     updateBatteryLevel(maxBatterySteps / 20);
-                    // prevent over charging the battery
                     if (batteryLevel > maxBatterySteps) {
                         setBatteryLevel(maxBatterySteps);
                     }
-                } else { // if not on docking station -> clean
+                } else {
                     updateBatteryLevel(-1);
                     updateDirtLevel(-1);
                     totalDirt--;
                 }
-            } else { // simNextStep != 'Stay'
-                // update the current position according to the step taken
+            } else {
                 updateCurrentPosition(simNextStep);
                 updateBatteryLevel(-1);
             }
@@ -262,14 +260,15 @@ int Simulator::run() {
         std::cerr << e.what() << std::endl;
         return -1;
     }
+
+    finished.store(true);
+    cv_timeout.notify_one();
+
     int score = calcScore();
     if (!summaryOnly) {
         createOutputFile();
-        return score;
     }
-    else {
-        return score;
-    }
+    return score;
 }
 
 void Simulator::updateSimTotalStepsLog(Step step) {
@@ -440,6 +439,25 @@ void Simulator::createOutputFile() {
 
     int score = calcScore();
     outputFile << "Score = " << score << std::endl;
+
+    std::string steps_log = parseSimTotalStepsLog();
+    outputFile << "Steps: " << steps_log << std::endl;
+}
+
+void createTimeoutOutputFile(int timeoutScore) {
+    // create outputFileName
+    std::string outputFileName = input_file_name + "-" + algoName;
+    std::ofstream outputFile(outputFileName);
+    if (!outputFile) { // make sure the output file has been created
+        std::string err = "Simulator::createOutputFile() Error: Failed to create output file: " + outputFileName;
+        throw std::runtime_error(err);
+    }
+    outputFile << "Status = DEAD" << std::endl; // CHECK IF RIGHT STATUS FOR TIMEOUT
+
+    std::string inDock = calcInDock();
+    outputFile << "InDock = " << inDock << std::endl;
+
+    outputFile << "Score = " << timeoutScore << std::endl;
 
     std::string steps_log = parseSimTotalStepsLog();
     outputFile << "Steps: " << steps_log << std::endl;
