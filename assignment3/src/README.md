@@ -1,13 +1,13 @@
 To build the whole project:
-1. Navigate to the src/ directory
+1. Navigate to /src/
 2. Run main_build_script.sh  
 
 To build Algorithm_206448649_314939398_A:
-1. Navigate to the src/Algorithm_206448649_314939398_A/ directory
+1. Navigate to /src/Algorithm_206448649_314939398_A/
 2. Run: algo_a_build_script.sh
 
 To build Algorithm_206448649_314939398_B:
-1. Navigate to the src/Algorithm_206448649_314939398_B/ directory
+1. Navigate to the /src/Algorithm_206448649_314939398_B/
 2. Run: algo_b_build_script.sh  
 
 The delete_and_rebuild.sh script will:

@@ -11,8 +11,8 @@ find . -name "*.error" -type f -delete
 rm -rf build
 
 # Create the build directory
-mkdir build
+#mkdir build
 
 # Configure and build the project using the new CMake commands
-cmake -S . -B build
-cmake --build build
+#cmake -S . -B build
+#cmake --build build
